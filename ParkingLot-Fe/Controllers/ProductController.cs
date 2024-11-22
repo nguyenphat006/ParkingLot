@@ -32,6 +32,30 @@ namespace ParkingLot_Fe.Controllers
         #endregion
 
 
+        //[HttpGet]
+        //public IActionResult Get(Guid id)
+        //{
+        //    try
+        //    {
+        //        ProductVM product = new ProductVM();
+        //        HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
+
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            string data = response.Content.ReadAsStringAsync().Result;
+        //            product = JsonConvert.DeserializeObject<ProductVM>(data);
+        //        }
+        //        return View(product);
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }
+        //}
+
+
         [HttpGet]
         public IActionResult Get(Guid id)
         {
@@ -45,15 +69,14 @@ namespace ParkingLot_Fe.Controllers
                     string data = response.Content.ReadAsStringAsync().Result;
                     product = JsonConvert.DeserializeObject<ProductVM>(data);
                 }
-                return View(product);
-
+                return PartialView("_ProductDetailsPartial", product); // Trả về PartialView
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View();
+                return BadRequest(new { message = ex.Message }); // Trả về lỗi nếu xảy ra vấn đề
             }
         }
+
 
         #region CREATE
 
