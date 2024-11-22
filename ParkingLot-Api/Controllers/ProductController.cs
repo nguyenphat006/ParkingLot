@@ -6,7 +6,7 @@ using ParkingLot_Api.Model;
 
 namespace ParkingLot_Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
