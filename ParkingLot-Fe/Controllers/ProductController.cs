@@ -14,6 +14,9 @@ namespace ParkingLot_Fe.Controllers
             _client = new HttpClient();
             _client.BaseAddress = baseAddress;
         }
+
+
+        #region GETLIST
         [HttpGet]
         public IActionResult Index()
         {
@@ -26,6 +29,33 @@ namespace ParkingLot_Fe.Controllers
             }
             return View(productsList);
         }
+        #endregion
+
+
+        [HttpGet]
+        public IActionResult Get(Guid id)
+        {
+            try
+            {
+                ProductVM product = new ProductVM();
+                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string data = response.Content.ReadAsStringAsync().Result;
+                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                }
+                return View(product);
+
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return View();
+            }
+        }
+
+        #region CREATE
 
         [HttpGet]
         public IActionResult Post()
@@ -54,10 +84,9 @@ namespace ParkingLot_Fe.Controllers
             }
             return View();
         }
+        #endregion
 
-
-
-        
+        #region UPDATE
         [HttpGet]
         public IActionResult Update(Guid id)
         {
@@ -105,7 +134,9 @@ namespace ParkingLot_Fe.Controllers
                 return View();
             }
         }
+        #endregion
 
+        #region DELETE
         [HttpGet]
         public IActionResult Delete(Guid id)
         {
@@ -147,5 +178,6 @@ namespace ParkingLot_Fe.Controllers
             }
             return View();
         }
+        #endregion
     }
 }
