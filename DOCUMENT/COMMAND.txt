@@ -1,0 +1,14 @@
+Connection String:  Data Source=....;Initial Catalog=ParkingLot;Integrated Security=True;Trust Server Certificate=True;Trusted_Connection=true;
+
+
+Package Maneger Console:
+Bước 1: Add-Migration Intial
+Bước 2: Update-Database: Khi dùng lệnh migration xong thì sẽ update mới vào db
+
+
+
++Slot:
+Id Guid Primary key
+SlotCode varchar(Max)
+Slot int
+
