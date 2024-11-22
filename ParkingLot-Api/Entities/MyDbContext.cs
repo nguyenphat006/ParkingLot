@@ -3,9 +3,9 @@ using ParkingLot_Api.Model;
 
 namespace ParkingLot_Api.Entities
 {
-    public class DbContext : Microsoft.EntityFrameworkCore.DbContext
+    public class MyDbContext : DbContext
     {
-        public DbContext(DbContextOptions<DbContext> options) : base(options)
+        public MyDbContext(DbContextOptions<MyDbContext> options) : base(options)
         {
         }
         public DbSet<Product> Products { get; set; }

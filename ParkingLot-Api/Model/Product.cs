@@ -6,9 +6,9 @@ namespace ParkingLot_Api.Model
     {
         public Guid Id { get; set; }
         [Required]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Required]
-        public float Price { get; set; }
+        public double Price { get; set; }
         [Required]
         public int Quantity { get; set; }
     }
