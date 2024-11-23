@@ -2,7 +2,7 @@
 
 namespace ParkingLot_Api.Model
 {
-    public class Product
+    public class MODELProduct
     {
         public Guid Id { get; set; }
         [Required]

@@ -71,7 +71,7 @@ namespace ParkingLot_Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Product model)
+        public IActionResult Put(MODELProduct model)
         {
             try
             {
