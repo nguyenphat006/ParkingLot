@@ -55,27 +55,28 @@ namespace ParkingLot_Fe.Controllers
         //    }
         //}
 
-
         [HttpGet]
-        public IActionResult Get(Guid id)
+        public IActionResult ShowViewPopup(Guid id)
         {
             try
             {
-                ProductVM product = new ProductVM();
+                ProductVM obj = new ProductVM();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                    obj = JsonConvert.DeserializeObject<ProductVM>(data);
                 }
-                return PartialView("_ProductDetailsPartial", product); // Trả về PartialView
+                return PartialView("~/Views/Product/PopupView.cshtml", obj); // Trả về PartialView
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message }); // Trả về lỗi nếu xảy ra vấn đề
+                TempData["errorMessage"] = ex.Message;
+                return PartialView("_ErrorModal"); // Trả về modal lỗi nếu có
             }
         }
+
 
 
         #region CREATE

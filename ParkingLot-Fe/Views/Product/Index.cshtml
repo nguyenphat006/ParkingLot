@@ -18,10 +18,10 @@
         </div> *@
     </div>
     <div class="card-body">
-        <p>
-            <a asp-action="Post">Create New</a>
-        </p>
         <table id="example1" class="table table-striped table-bordered">
+            <p>
+                <a asp-action="Post">Create New</a>
+            </p>
             <thead>
                 <tr>
                     <th style="width: 10%">STT</th>
@@ -49,10 +49,10 @@
                             <a class="btn btn-info btn-sm" href="@Url.Action("Update", new { id = item.Id })">
                                 <i class="fas fa-pencil-alt"></i> Edit
                             </a> *@
-                            <a class="btn btn-primary btn-sm btn-view" data-id="item.Id" href="javascript:void(0)">
+                            <a class="btn btn-primary btn-sm btn-view" onclick="xemThongTin('@item.Id')">
                                 <i class="fas fa-folder"></i> Xem
                             </a>
-                            <a class="btn btn-info btn-sm btn-edit" data-id="item.Id" href="javascript:void(0)">
+                            <a class="btn btn-info btn-sm btn-edit" onclick="suaThongTin(item.Id)">
                                 <i class="fas fa-pencil-alt"></i> Sửa
                             </a>
                             <a class="btn btn-danger btn-sm" href="@Url.Action("Delete",  new { id = item.Id })">
@@ -67,47 +67,32 @@
     </div>
 </div>
 
-@Html.Partial("_ModalPartial")
+<!-- Modal -->
+<div class="modal fade" id="modal-default">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="modelContainer">
+                <!-- Nơi load nội dung -->
+            </div> 
+        </div>
+    </div>
+</div>
+ <script>
+    //Xem thông tin.
+    function xemThongTin(id) {
+            var url = '@Url.Action("ShowViewPopup", "Product")' + "?id=" + id;
 
-
-
-@section Scripts {
-    <script>
-        // Hiển thị modal và load nội dung qua AJAX
-        function loadModal(title, url) {
-            $('#modalTemplateLabel').text(title); // Đặt tiêu đề modal
-            $('#modalBody').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>'); // Loading spinner
-
-            // Gửi AJAX request
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function (result) {
-                    $('#modalBody').html(result); // Đổ nội dung vào modal
-                },
-                error: function (xhr) {
-                    $('#modalBody').html('<p class="text-danger">Đã xảy ra lỗi: ' + xhr.responseText + '</p>'); // Hiển thị lỗi nếu xảy ra
-                }
-            });
-
-            $('#modalTemplate').modal('show'); // Hiển thị modal
-        }
-
-        // Xử lý sự kiện click View
-        $(document).on('click', '.btn-view', function () {
-            var productId = $(this).data('id');
-            var url = '/Product/Get/' + productId;
-            loadModal('Chi tiết sản phẩm', url); // Tải modal với nội dung chi tiết
+        $.get(url, function (data) {
+            $('#modelContainer').html(data); // Load dữ liệu vào modal
+            $('#modal-default').modal('show'); // Hiển thị modal
+        }).fail(function () {
+            alert('Failed to load product details.');
         });
+    }
 
-        // Xử lý sự kiện click Edit
-        $(document).on('click', '.btn-edit', function () {
-            var productId = $(this).data('id');
-            var url = '/Product/Edit/' + productId;
-            loadModal('Sửa sản phẩm', url); // Tải modal với nội dung sửa
-        });
-    </script>
-}
+       
+ </script>
+
 
 
 
