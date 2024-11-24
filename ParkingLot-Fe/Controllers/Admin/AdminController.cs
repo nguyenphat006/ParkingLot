@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace ParkingLot_Fe.Controllers
+namespace ParkingLot_Fe.Controllers.Admin
 {
     public class AdminController : Controller
     {
