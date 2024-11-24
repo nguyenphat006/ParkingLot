@@ -57,8 +57,7 @@ namespace ParkingLot_Api.Controllers
                 if (model.Id == Guid.Empty)
                 {
                     model.Id = Guid.NewGuid();
-                }
-
+                }                
                 _context.Products.Add(model);
                 _context.SaveChanges();
                 return Ok("Sản phẩm đã được tạo");
