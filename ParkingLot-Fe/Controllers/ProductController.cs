@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using ParkingLot_Fe.Models;
 using System.Text;
-
+using MODELS.DANHMUC;
 namespace ParkingLot_Fe.Controllers
 {
     public class ProductController : Controller
@@ -20,53 +20,29 @@ namespace ParkingLot_Fe.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            List<ProductVM> productsList = new List<ProductVM>();
+            List<MODELProduct> productsList = new List<MODELProduct>();
             HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetAll").Result;
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                productsList = JsonConvert.DeserializeObject<List<ProductVM>>(data);
+                productsList = JsonConvert.DeserializeObject<List<MODELProduct>>(data);
             }
             return View(productsList);
         }
         #endregion
-
-
-        //[HttpGet]
-        //public IActionResult Get(Guid id)
-        //{
-        //    try
-        //    {
-        //        ProductVM product = new ProductVM();
-        //        HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
-
-        //        if (response.IsSuccessStatusCode)
-        //        {
-        //            string data = response.Content.ReadAsStringAsync().Result;
-        //            product = JsonConvert.DeserializeObject<ProductVM>(data);
-        //        }
-        //        return View(product);
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        TempData["errorMessage"] = ex.Message;
-        //        return View();
-        //    }
-        //}
 
         [HttpGet]
         public IActionResult ShowViewPopup(Guid id)
         {
             try
             {
-                ProductVM obj = new ProductVM();
+                MODELProduct obj = new MODELProduct();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    obj = JsonConvert.DeserializeObject<ProductVM>(data);
+                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
                 }
                 return PartialView("~/Views/Product/PopupView.cshtml", obj); // Trả về PartialView
             }
@@ -78,87 +54,135 @@ namespace ParkingLot_Fe.Controllers
         }
 
 
-
-        #region CREATE
-
         [HttpGet]
-        public IActionResult Post()
+        public IActionResult ShowInsertPopup()
         {
-            return View();
+            var model = new MODELProduct(); // Model mới để thêm sản phẩm
+            return PartialView("~/Views/Product/PopupDetail.cshtml", model);
         }
 
-        [HttpPost]
-        public IActionResult Post(ProductVM model)
+        [HttpGet]
+        public IActionResult ShowUpdatePopup(Guid id)
         {
             try
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["successMessage"] = "Thêm sản phẩm thành công";
-                    return RedirectToAction("Index");
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }
-            return View();
-        }
-        #endregion
-
-        #region UPDATE
-        [HttpGet]
-        public IActionResult Update(Guid id)
-        {
-            try
-            {
-                ProductVM product = new ProductVM();
+                MODELProduct obj = new MODELProduct();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
                 }
-                return View(product);
 
+                // Trả về PartialView thay vì View
+                return PartialView("~/Views/Product/PopupDetail.cshtml", obj);
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
-                return View();
+
+                // Trả về PartialView rỗng để tránh lỗi modal
+                return PartialView("~/Views/Product/PopupDetail.cshtml");
             }
         }
+
+
         [HttpPost]
-        public IActionResult Update(ProductVM model)
+        public IActionResult Post(MODELProduct model)
         {
             try
             {
-                string endpoint = $"/product/Put/{model.Id}"; // Thêm {id} vào URL
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+                HttpResponseMessage response;
 
-                if (response.IsSuccessStatusCode)
+                if (model.Id == Guid.Empty || model.Id == null) // Kiểm tra nếu là Create
                 {
-                    TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
-                    return RedirectToAction("Index");
+                    response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Thêm sản phẩm thành công";
+                        return RedirectToAction("Index");
+                    }
+                }
+                else // Nếu có Id, thực hiện Update
+                {
+                    string endpoint = $"/product/Put/{model.Id}";
+                    response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
+                        return RedirectToAction("Index");
+                    }
                 }
 
-                return View();
+                // Xử lý khi không thành công
+                TempData["errorMessage"] = "Yêu cầu không thành công. Vui lòng kiểm tra lại!";
+                return View(model);
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
-                return View();
+                return View(model);
             }
         }
-        #endregion
+
+        //#region CREATE
+        //[HttpPost]
+        //public IActionResult Post(MODELProduct model)
+        //{
+        //    try
+        //    {
+        //        string data = JsonConvert.SerializeObject(model);
+        //        StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+        //        HttpResponseMessage response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            TempData["successMessage"] = "Thêm sản phẩm thành công";
+        //            return RedirectToAction("Index");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }
+        //    return View();
+        //}
+        //#endregion
+
+        //#region UPDATE
+
+        //[HttpPost]
+        //public IActionResult Update(MODELProduct model)
+        //{
+        //    try
+        //    {
+        //        string endpoint = $"/product/Put/{model.Id}"; // Thêm {id} vào URL
+        //        string data = JsonConvert.SerializeObject(model);
+        //        StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+        //        HttpResponseMessage response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
+        //            return RedirectToAction("Index");
+        //        }
+
+        //        return View();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }
+        //}
+        //#endregion
 
         #region DELETE
         [HttpGet]
@@ -166,12 +190,12 @@ namespace ParkingLot_Fe.Controllers
         {
             try
             {
-                ProductVM product = new ProductVM();
+                MODELProduct product = new MODELProduct();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                    product = JsonConvert.DeserializeObject<MODELProduct>(data);
                     return View(product);
 
                 }

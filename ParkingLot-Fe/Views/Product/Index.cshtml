@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ParkingLot_Fe.Models.ProductVM>
+﻿@model IEnumerable<MODELS.DANHMUC.MODELProduct>
 
 @{
     ViewData["Title"] = "Index";
@@ -20,7 +20,10 @@
     <div class="card-body">
         <table id="example1" class="table table-striped table-bordered">
             <p>
-                <a asp-action="Post">Create New</a>
+                @* <a asp-action="Post">Thêm mới</a> *@
+                <a class="btn btn-primary btn-sm btn-insert" onclick="themThongTin()">
+                    <i class="fa-solid fa-plus"></i> Thêm mới
+                </a>
             </p>
             <thead>
                 <tr>
@@ -52,7 +55,7 @@
                             <a class="btn btn-primary btn-sm btn-view" onclick="xemThongTin('@item.Id')">
                                 <i class="fas fa-folder"></i> Xem
                             </a>
-                            <a class="btn btn-info btn-sm btn-edit" onclick="suaThongTin(item.Id)">
+                            <a class="btn btn-info btn-sm btn-edit" onclick="suaThongTin('@item.Id')">
                                 <i class="fas fa-pencil-alt"></i> Sửa
                             </a>
                             <a class="btn btn-danger btn-sm" href="@Url.Action("Delete",  new { id = item.Id })">
@@ -85,10 +88,29 @@
         $.get(url, function (data) {
             $('#modelContainer').html(data); // Load dữ liệu vào modal
             $('#modal-default').modal('show'); // Hiển thị modal
-        }).fail(function () {
-            alert('Failed to load product details.');
         });
     }
+    //Thêm thông tin.
+    function themThongTin() {
+        var url = '@Url.Action("ShowInsertPopup", "Product")';
+
+        $.get(url, function (data) {
+            $('#modelContainer').html(data);
+            $('#modal-default').modal('show');
+        });
+    }
+
+    //Sửa thông tin.
+    function suaThongTin(id) {
+        var url = '@Url.Action("ShowUpdatePopup", "Product")' + "?id=" + id;
+        $.get(url, function (data) {
+            $('#modelContainer').html(data);
+            $('#modal-default').modal('show');
+        });
+    }
+
+
+    
 
        
  </script>

@@ -20,6 +20,11 @@
 
   <ItemGroup>
     <Folder Include="Entities\" />
+    <Folder Include="Model\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MODELS\MODELS.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,1 +1,106 @@
-﻿
+﻿@model MODELS.DANHMUC.MODELProduct
+@{
+    ViewData["Title"] = "PopupDetail";
+}
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmProduct", @class = "forms-sample" }))
+    @Html.AntiForgeryToken()
+    <div class="modal-header">
+    <h4 class="modal-title" id="exampleModalLabel">Thêm mới sản phẩm</h4>
+        @* @if (!Model.IsEdit)
+        {
+            <h4 class="modal-title" id="exampleModalLabel">Thêm mới sản phẩm</h4>
+        }
+        else
+        {
+            <h4 class="modal-title" id="exampleModalLabel">Cập nhật sản phẩm</h4>
+        } *@
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopUp()"></button>
+    </div>
+    <div class="modal-body">
+        <form>
+        <div class="mb-3">
+            <label class="col-form-label">
+                Tên sản phẩm
+            </label>
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+        </div>
+        <div class="mb-3">
+            <label class="col-form-label">
+                Giá tiền
+            </label>
+            @Html.TextBoxFor(model => model.Price, new { @class = "form-control"})
+        </div>
+        <div class="mb-3">
+            <label class="col-form-label">
+                Số lượng
+            </label>
+            @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control"})
+        </div>
+
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" id="btnLuu" class="btn btn-success btn-sm"><i class="fas fa-check-square"></i> Lưu</button>
+      @*   @{
+            if (!Model.IsEdit) //tạo mới mới có Lưu và thêm
+            {
+                        <button type="button" class="btn btn-success btn-sm" id="btnLuuTiep"><i class="fas fa-check-square"></i> Lưu và thêm </button>
+            }
+        } *@
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopUp()">Đóng</button>
+    </div>
+}
+
+
+
+
+<script>
+    $(document).on('click', '#btnLuu', function (event) {
+        event.preventDefault(); // Ngăn hành vi mặc định của nút
+
+        // Kiểm tra dữ liệu hợp lệ (nếu cần)
+        if ($('#Name').val().trim() === "") {
+            alert("Tên sản phẩm không được để trống!");
+            return;
+        }
+        if ($('#Price').val() <= 0) {
+            alert("Giá phải lớn hơn 0!");
+            return;
+        }
+
+        // Gửi dữ liệu qua AJAX
+        $.ajax({
+            url: '/Product/Post', // Endpoint gọi đến Controller
+            type: "POST",
+            data: $('#frmProduct').serialize(), // Serialize toàn bộ form
+            success: function (data) {
+                // Kiểm tra phản hồi từ server
+                if (data.success) {
+                    if (data.data) {
+                        showSuccessNotify("Cập nhật thành công!");
+                    } else {
+                        showSuccessNotify("Thêm mới thành công!");
+                    }
+                    closePopUp(); // Đóng modal
+                    location.reload(); // Làm mới danh sách sản phẩm
+                } else {
+                    showErrorNotify(data.message || "Có lỗi xảy ra!");
+                }
+            },
+            error: function () {
+                showErrorNotify("Không thể kết nối đến server.");
+            },
+            complete: function () {
+                // Ẩn loading
+                showLoadingElement(false, 'modalLoading');
+            }
+        });
+    });
+
+
+    function closePopUp() {
+        $('#modal-default').modal('hide');
+    }
+</script>

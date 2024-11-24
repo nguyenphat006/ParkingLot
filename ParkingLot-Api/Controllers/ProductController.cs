@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ParkingLot_Api.Entities;
-using ParkingLot_Api.Model;
-
+using MODELS.DANHMUC;
 namespace ParkingLot_Api.Controllers
 {
     [Route("api/[controller]/[action]")]
