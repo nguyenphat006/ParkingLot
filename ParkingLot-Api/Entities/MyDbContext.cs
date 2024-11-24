@@ -15,9 +15,13 @@ public partial class MyDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Parking> Parkings { get; set; }
+
+    public virtual DbSet<ParkingSlot> ParkingSlots { get; set; }
+
     public virtual DbSet<Product> Products { get; set; }
 
-    public virtual DbSet<SupperHeroDemo> SupperHeroDemos { get; set; }
+    public virtual DbSet<Slot> Slots { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -25,14 +29,63 @@ public partial class MyDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Parking>(entity =>
+        {
+            entity.ToTable("Parking");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.CreateBy).HasMaxLength(256);
+            entity.Property(e => e.CreateDate).HasColumnType("datetime");
+            entity.Property(e => e.DeleteBy).HasMaxLength(256);
+            entity.Property(e => e.DeleteDate).HasColumnType("datetime");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.District).HasMaxLength(120);
+            entity.Property(e => e.Image).IsUnicode(false);
+            entity.Property(e => e.Latitude).HasColumnType("decimal(18, 8)");
+            entity.Property(e => e.Longitude).HasColumnType("decimal(11, 8)");
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.ParkingCode)
+                .HasMaxLength(256)
+                .IsUnicode(false);
+            entity.Property(e => e.Province).HasMaxLength(120);
+            entity.Property(e => e.UpdateBy).HasMaxLength(256);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<ParkingSlot>(entity =>
+        {
+            entity.ToTable("ParkingSlot");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreateBy).HasMaxLength(256);
+            entity.Property(e => e.CreateDate).HasColumnType("datetime");
+            entity.Property(e => e.DeleteBy).HasMaxLength(256);
+            entity.Property(e => e.DeleteDate).HasColumnType("datetime");
+            entity.Property(e => e.UpdateBy).HasMaxLength(256);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+        });
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
         });
 
-        modelBuilder.Entity<SupperHeroDemo>(entity =>
+        modelBuilder.Entity<Slot>(entity =>
         {
-            entity.ToTable("SupperHeroDEMO");
+            entity.ToTable("Slot");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreateBy).HasMaxLength(256);
+            entity.Property(e => e.CreateDate).HasColumnType("datetime");
+            entity.Property(e => e.DeleteBy).HasMaxLength(256);
+            entity.Property(e => e.DeleteDate).HasColumnType("datetime");
+            entity.Property(e => e.SlotCode)
+                .HasMaxLength(256)
+                .IsUnicode(false);
+            entity.Property(e => e.Status).HasMaxLength(120);
+            entity.Property(e => e.UpdateBy).HasMaxLength(256);
+            entity.Property(e => e.UpdateDate).HasColumnType("datetime");
         });
 
         OnModelCreatingPartial(modelBuilder);
