@@ -16,7 +16,12 @@ namespace ParkingLot_Fe.Controllers
         }
 
 
-        #region GETLIST
+        //public IActionResult Index()
+        //{
+        //    return View("~/Views/Product/Index.cshtml");
+        //}
+
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -29,7 +34,21 @@ namespace ParkingLot_Fe.Controllers
             }
             return View(productsList);
         }
-        #endregion
+
+
+        //[HttpGet]
+        //public IActionResult GetList()
+        //{
+        //    List<MODELProduct> productsList = new List<MODELProduct>();
+        //    HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetAll").Result;
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        string data = response.Content.ReadAsStringAsync().Result;
+        //        productsList = JsonConvert.DeserializeObject<List<MODELProduct>>(data);
+        //    }
+        //    return Json(productsList); // Trả về JSON
+        //}
+
 
         [HttpGet]
         public IActionResult ShowViewPopup(Guid id)
