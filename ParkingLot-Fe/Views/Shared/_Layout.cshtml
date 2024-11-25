@@ -19,6 +19,15 @@
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="~/Website/assets/css/demo.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
+    @* <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.css" rel="stylesheet" /> *@
+    <script src="~/Website/map/goong-js.js"></script>
+    <script src="~/Website/map/goong-geocoder.min.js"></script>
+    <link href="~/Website/map/goong-js.css" rel="stylesheet" />
+    <link href="~/Website/map/goong-geocoder.css" rel="stylesheet" />
+    <link href="~/Website/style.css" rel="stylesheet" />
 </head>
 <body>
     <div class="wrapper">
@@ -27,12 +36,12 @@
             <div class="sidebar-logo">
                 <!-- Logo Header -->
                 <div class="logo-header" data-background-color="dark">
-                    <a href="index.html" class="logo">
+                    @* <a href="index.html" class="logo">
                         <img src="~/Website/assets/img/kaiadmin/logo_light.svg"
                              alt="navbar brand"
                              class="navbar-brand"
                              height="20" />
-                    </a>
+                    </a> *@
                     <div class="nav-toggle">
                         <button class="btn btn-toggle toggle-sidebar">
                             <i class="gg-menu-right"></i>
@@ -105,41 +114,8 @@
                 </div>
                 <!-- Navbar Header -->
                 <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
-                    <div class="container-fluid">
-                        <nav class="navbar navbar-header-left navbar-expand-lg navbar-form nav-search p-0 d-none d-lg-flex">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <button type="submit" class="btn btn-search pe-1">
-                                        <i class="fa fa-search search-icon"></i>
-                                    </button>
-                                </div>
-                                <input type="text"
-                                       placeholder="Search ..."
-                                       class="form-control" />
-                            </div>
-                        </nav>
-
-                        <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
-                            <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
-                                <a class="nav-link dropdown-toggle"
-                                   data-bs-toggle="dropdown"
-                                   href="#"
-                                   role="button"
-                                   aria-expanded="false"
-                                   aria-haspopup="true">
-                                    <i class="fa fa-search"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-search animated fadeIn">
-                                    <form class="navbar-left navbar-form nav-search">
-                                        <div class="input-group">
-                                            <input type="text"
-                                                   placeholder="Tìm kiếm ..."
-                                                   class="form-control" />
-                                        </div>
-                                    </form>
-                                </ul>
-                            </li>
-
+                    <div class="container-fluid">                        
+                        <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">                            
                             <li class="nav-item topbar-user dropdown hidden-caret">
                                 <a class="dropdown-toggle profile-pic"
                                    data-bs-toggle="dropdown"
@@ -157,40 +133,40 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-user animated fadeIn">
                                     <div class="dropdown-user-scroll scrollbar-outer">
-                                    <li>
-                                        <div class="user-box">
-                                            <div class="avatar-lg">
-                                                <img src="~/Website/assets/img/profile.jpg"
-                                                     alt="image profile"
-                                                     class="avatar-img rounded" />
+                                        <li>
+                                            <div class="user-box">
+                                                <div class="avatar-lg">
+                                                    <img src="~/Website/assets/img/profile.jpg"
+                                                         alt="image profile"
+                                                         class="avatar-img rounded" />
+                                                </div>
+                                                <div class="u-text">
+                                                    <h4>Nguyễn Đăng Phát</h4>
+                                                    <p class="text-muted">nguyendangphat1312@gmail.com</p>
+                                                    <a href="profile.html"
+                                                       class="btn btn-xs btn-secondary btn-sm">Xem hồ sơ</a>
+                                                </div>
                                             </div>
-                                            <div class="u-text">
-                                                <h4>Nguyễn Đăng Phát</h4>
-                                                <p class="text-muted">nguyendangphat1312@gmail.com</p>
-                                                <a href="profile.html"
-                                                   class="btn btn-xs btn-secondary btn-sm">Xem hồ sơ</a>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Cài đặt</a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#">Đăng xuất</a>
-                                    </li>
+                                        </li>
+                                        <li>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Cài đặt</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Đăng xuất</a>
+                                        </li>
+                                    </div>
+                                </ul>
+                             </li>
+                        </ul>
                     </div>
-                    </ul>
-                    </li>
-                    </ul>
-            </div>
-            </nav>
+                </nav>
             <!-- End Navbar -->
         </div>
 
         <div class="container">
-            <div class="page-inner">
-                    @RenderBody()
-            </div>
+
+                @RenderBody()
+
         </div>        
     </div>
 
@@ -233,32 +209,31 @@
     <script src="~/Website/assets/js/setting-demo.js"></script>
     <script src="~/Website/assets/js/demo.js"></script>
     <script>
-        $("#lineChart").sparkline([102, 109, 120, 99, 110, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#177dff",
-            fillColor: "rgba(23, 125, 255, 0.14)",
-        });
+        function toggleSidebar(id) {
+            const elem = document.getElementById(id);
+            const collapsed = elem.classList.contains('collapsed');
+            if (collapsed) {
+                elem.classList.remove('collapsed');
+            } else {
+                elem.classList.add('collapsed');
+            }
+        }
 
-        $("#lineChart2").sparkline([99, 125, 122, 105, 110, 124, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#f3545d",
-            fillColor: "rgba(243, 84, 93, .14)",
+        goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
+        const map = new goongjs.Map({
+            container: 'map',
+            style: 'https://tiles.goong.io/assets/goong_map_web.json',
+            center: [105.84478, 21.02897],
+            zoom: 13
         });
+        map.addControl(new goongjs.NavigationControl(), 'top-right');
+        map.addControl(new goongjs.FullscreenControl(), 'top-right');
 
-        $("#lineChart3").sparkline([105, 103, 123, 100, 95, 105, 115], {
-            type: "line",
-            height: "70",
-            width: "100%",
-            lineWidth: "2",
-            lineColor: "#ffa534",
-            fillColor: "rgba(255, 165, 52, .14)",
+        const geocoder = new GoongGeocoder({
+            accessToken: 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW',
+            goongjs: goongjs
         });
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
     </script>
 </body>
 </html>
