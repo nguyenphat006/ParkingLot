@@ -108,47 +108,52 @@ namespace ParkingLot_Fe.Controllers
 
 
         [HttpPost]
-        public IActionResult Post(MODELProduct model)
+        public IActionResult Post([FromBody] MODELProduct model)
         {
             try
             {
+                if (model == null)
+                {
+                    // Trường hợp model bị null hoặc không hợp lệ
+                    return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+                }
+
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
                 HttpResponseMessage response;
 
-                if (model.Id == Guid.Empty || model.Id == null) // Kiểm tra nếu là Create
+                if (model.Id == Guid.Empty || model.Id == null) // Tạo mới
                 {
                     response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        TempData["successMessage"] = "Thêm sản phẩm thành công";
-                        return RedirectToAction("Index");
+                        return Json(new { success = true, data = false, message = "Thêm sản phẩm thành công!" });
                     }
                 }
-                else // Nếu có Id, thực hiện Update
+                else // Cập nhật
                 {
                     string endpoint = $"/product/Put/{model.Id}";
                     response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
-                        return RedirectToAction("Index");
+                        return Json(new { success = true, data = true, message = "Chỉnh sửa sản phẩm thành công!" });
                     }
                 }
 
-                // Xử lý khi không thành công
-                TempData["errorMessage"] = "Yêu cầu không thành công. Vui lòng kiểm tra lại!";
-                return View(model);
+                // Nếu phản hồi không thành công
+                string errorDetails = response?.Content.ReadAsStringAsync().Result ?? "Không rõ lý do.";
+                return Json(new { success = false, message = $"Yêu cầu không thành công: {errorDetails}" });
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View(model);
+                // Xử lý lỗi và trả về phản hồi phù hợp
+                return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
         }
+
 
         //#region CREATE
         //[HttpPost]
@@ -204,47 +209,32 @@ namespace ParkingLot_Fe.Controllers
         //#endregion
 
         #region DELETE
-        [HttpGet]
+        [HttpDelete]
         public IActionResult Delete(Guid id)
         {
             try
             {
-                MODELProduct product = new MODELProduct();
-                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<MODELProduct>(data);
-                    return View(product);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }
-            return View();
-        }
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirm(Guid id)
-        {
-            try
-            {
+                // Gửi yêu cầu đến API để xóa sản phẩm
                 HttpResponseMessage response = _client.DeleteAsync(_client.BaseAddress + "/product/Delete/" + id).Result;
+
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["successMessage"] = "Xóa sản phẩm thành công";
-                    return RedirectToAction("Index");
+                    return Json(new { success = true, message = "Xóa sản phẩm thành công!" });
+                }
+                else
+                {
+                    // Đọc thông báo lỗi từ API nếu có
+                    string errorDetails = response.Content.ReadAsStringAsync().Result;
+                    return Json(new { success = false, message = $"Xóa không thành công: {errorDetails}" });
                 }
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View();
+                // Trả về thông báo lỗi nếu xảy ra ngoại lệ
+                return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
-            return View();
         }
+
         #endregion
     }
 }

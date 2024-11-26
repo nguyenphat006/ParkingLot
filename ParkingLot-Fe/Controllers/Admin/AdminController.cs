@@ -7,7 +7,7 @@ namespace ParkingLot_Fe.Controllers.Admin
         public IActionResult Index()
         {
             // Sử dụng layout dành riêng cho Admin
-            ViewBag.Layout = "~/Views/Shared/_LayoutAdminDB.cshtml";
+            ViewBag.Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
             return View();
         }
     }

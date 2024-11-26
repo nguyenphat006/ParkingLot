@@ -33,19 +33,19 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Website}/{action=Index}/{id?}");
+    pattern: "{controller=Admin}/{action=Index}/{id?}");
 
 app.UseEndpoints(endpoints =>
 {
-    // Route cho Admin
-    endpoints.MapControllerRoute(
-        name: "Admin",
-        pattern: "admin/{controller=Admin}/{action=Index}/{id?}");
+    //// Route cho Admin
+    //endpoints.MapControllerRoute(
+    //    name: "Admin",
+    //    pattern: "admin/{controller=Admin}/{action=Index}/{id?}");
 
     // Route mặc định
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Website}/{action=Index}/{id?}");
+        pattern: "{controller=Admin}/{action=Index}/{id?}");
 });
 
 

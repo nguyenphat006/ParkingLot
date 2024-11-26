@@ -22,7 +22,8 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar {
+
+/*.sidebar {
     width: 300px;
     height: 100%;
     background: white;
@@ -34,30 +35,26 @@
 }
 
     .sidebar.collapsed {
-        transform: translateX(-300px); /* Đẩy sidebar ra ngoài màn hình */
-    }
-
-.sidebar-content {
+        transform: translateX(-300px);*/ /* Đẩy sidebar ra ngoài màn hình */
+/*}*/
+/*.sidebar-content {
     padding: 20px;
     text-align: center;
-}
-
-    .sidebar-content img {
+}*/
+/*    .sidebar-content img {
         width: 100%;
         max-width: 250px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-bottom: 20px;
-    }
-
-.sidebar-text {
+    }*/
+/*.sidebar-text {
     font-size: 18px;
     margin-top: 10px;
     font-weight: bold;
     color: #333;
     margin-bottom: 15px;
-}
-
+}*/
 .custom-line {
     margin: 20px 0;
     width: 80%;
@@ -89,10 +86,10 @@
     transform: translateY(-50%);
 }*/
 
-    .sidebar-toggle:hover {
+/*    .sidebar-toggle:hover {
         background-color: #0056b3;
     }
-
+*/
 #menu {
     position: absolute;
     top: 10px;
@@ -119,7 +116,7 @@
     height: 100% !important;
 }
 /* Responsive styles */
-@media (max-width: 768px) {
+/*@media (max-width: 768px) {
     .sidebar {
         width: 100%;
         height: auto;
@@ -153,4 +150,4 @@
         width: 100%;
         padding: 10px;
     }
-}
+}*/

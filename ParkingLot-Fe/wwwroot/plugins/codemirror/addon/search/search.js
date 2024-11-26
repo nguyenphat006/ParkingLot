@@ -1,4 +1,4 @@
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
+﻿// CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
 
 // Define search commands. Depends on dialog.js or another
@@ -203,7 +203,7 @@
 
   function getQueryDialog(cm)  {
     return el("", null,
-              el("span", {className: "CodeMirror-search-label"}, cm.phrase("Search:")), " ",
+              el("span", {className: "CodeMirror-search-label"}, cm.phrase("Tìm kiếm:")), " ",
               el("input", {type: "text", "style": "width: 10em", className: "CodeMirror-search-field"}), " ",
               el("span", {style: "color: #888", className: "CodeMirror-search-hint"},
                  cm.phrase("(Use /re/ syntax for regexp search)")));
