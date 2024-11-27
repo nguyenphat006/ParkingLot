@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ParkingLot_Api.Endentity;
 using ParkingLot_Api.Entities;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

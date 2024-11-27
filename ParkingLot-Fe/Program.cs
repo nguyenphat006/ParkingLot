@@ -1,4 +1,9 @@
-﻿using System.Net;
+﻿using Microsoft.AspNetCore.Identity;
+using MODELS.TAIKHOAN;
+using Microsoft.EntityFrameworkCore;
+using ParkingLot_Api.Endentity;
+using System.Net;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +19,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 //app.UseStatusCodePages(async context =>
 //{
@@ -31,9 +37,12 @@ app.UseRouting();
 app.UseAuthorization();
 
 
+
+
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 app.UseEndpoints(endpoints =>
 {
