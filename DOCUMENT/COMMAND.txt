@@ -1,16 +1,1 @@
-Connection String:  Data Source=....;Initial Catalog=ParkingLot;Integrated Security=True;Trust Server Certificate=True;Trusted_Connection=true;
-
-
-Package Maneger Console:
-Bước 1: Add-Migration Intial
-Bước 2: Update-Database: Khi dùng lệnh migration xong thì sẽ update mới vào db
-
-
-
-+ParkingLot:
-Id varchar(256) Primary key
-ParkingCode 
-varchar(Max)
-Name nvarchar(256)
-Address nvarchar(256)
-Image varchar(Max)
+Scaffold-DbContext "Data Source=.......;Initial Catalog=ParkingLot;Integrated Security=True;Trust Server Certificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context MyDbContext -f

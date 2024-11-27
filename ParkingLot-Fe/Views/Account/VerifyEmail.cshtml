@@ -1,0 +1,39 @@
+﻿@using MODELS.TAIKHOAN;
+@model MODELVerifyEmail;
+
+@{
+    ViewData["Title"] = "VerifyEmail";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+}
+
+<div class="container">
+    <div class="forms">
+        <div class="form-content">
+            <div class="login-form w-100">
+                <div class="title">Xác nhận email</div>
+                <form asp-action="VerifyEmail" method="Post">
+                    <div class="input-boxes">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="input-box">
+                            <i class="fas fa-envelope"></i>
+                            <input asp-for="Email" type="text" placeholder="Nhập Email của bạn" required>
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>                       
+                        <div class="button input-box">
+                            <input value="Xác nhận" type="submit">
+                        </div> 
+                        <div class="text-center">
+                            <a asp-controller="Account" asp-action="Login">Quay lại</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

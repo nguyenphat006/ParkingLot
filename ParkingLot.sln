@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParkingLot-Api", "ParkingLot-Api\ParkingLot-Api.csproj", "{6009C78C-16C9-4F77-B00C-38819DADC515}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParkingLot-Fe", "ParkingLot-Fe\ParkingLot-Fe.csproj", "{FEAF7202-AF2B-4567-AB17-BC2CA7C9A8AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParkingLot-Fe", "ParkingLot-Fe\ParkingLot-Fe.csproj", "{FEAF7202-AF2B-4567-AB17-BC2CA7C9A8AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MODELS", "MODELS\MODELS.csproj", "{2878D42F-36FC-49C8-819F-BEF4BBAEBBBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{FEAF7202-AF2B-4567-AB17-BC2CA7C9A8AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEAF7202-AF2B-4567-AB17-BC2CA7C9A8AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEAF7202-AF2B-4567-AB17-BC2CA7C9A8AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2878D42F-36FC-49C8-819F-BEF4BBAEBBBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2878D42F-36FC-49C8-819F-BEF4BBAEBBBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2878D42F-36FC-49C8-819F-BEF4BBAEBBBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2878D42F-36FC-49C8-819F-BEF4BBAEBBBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

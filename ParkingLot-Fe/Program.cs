@@ -1,3 +1,10 @@
+﻿using Microsoft.AspNetCore.Identity;
+using MODELS.TAIKHOAN;
+using Microsoft.EntityFrameworkCore;
+using ParkingLot_Api.Endentity;
+using System.Net;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +20,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+//app.UseStatusCodePages(async context =>
+//{
+//    var response = context.HttpContext.Response;
+
+//    if (response.StatusCode == (int)HttpStatusCode.Unauthorized)
+//        response.Redirect("/Website/Index");
+//});
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -20,8 +36,26 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+
+
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
+
+app.UseEndpoints(endpoints =>
+{
+    //// Route cho Admin
+    //endpoints.MapControllerRoute(
+    //    name: "Admin",
+    //    pattern: "admin/{controller=Admin}/{action=Index}/{id?}");
+
+    // Route mặc định
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Admin}/{action=Index}/{id?}");
+});
+
 
 app.Run();

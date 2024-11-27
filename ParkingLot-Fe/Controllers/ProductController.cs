@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using ParkingLot_Fe.Models;
 using System.Text;
-
+using MODELS.DANHMUC;
 namespace ParkingLot_Fe.Controllers
 {
     public class ProductController : Controller
@@ -16,168 +16,225 @@ namespace ParkingLot_Fe.Controllers
         }
 
 
-        #region GETLIST
+        //public IActionResult Index()
+        //{
+        //    return View("~/Views/Product/Index.cshtml");
+        //}
+
+
         [HttpGet]
         public IActionResult Index()
         {
-            List<ProductVM> productsList = new List<ProductVM>();
+            List<MODELProduct> productsList = new List<MODELProduct>();
             HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetAll").Result;
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                productsList = JsonConvert.DeserializeObject<List<ProductVM>>(data);
+                productsList = JsonConvert.DeserializeObject<List<MODELProduct>>(data);
             }
             return View(productsList);
         }
-        #endregion
+
+
+        //[HttpGet]
+        //public IActionResult GetList()
+        //{
+        //    List<MODELProduct> productsList = new List<MODELProduct>();
+        //    HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetAll").Result;
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        string data = response.Content.ReadAsStringAsync().Result;
+        //        productsList = JsonConvert.DeserializeObject<List<MODELProduct>>(data);
+        //    }
+        //    return Json(productsList); // Trả về JSON
+        //}
 
 
         [HttpGet]
-        public IActionResult Get(Guid id)
+        public IActionResult ShowViewPopup(Guid id)
         {
             try
             {
-                ProductVM product = new ProductVM();
+                MODELProduct obj = new MODELProduct();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
                 }
-                return View(product);
-
+                return PartialView("~/Views/Product/PopupView.cshtml", obj); // Trả về PartialView
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
-                return View();
+                return PartialView("_ErrorModal"); // Trả về modal lỗi nếu có
             }
         }
 
-        #region CREATE
 
         [HttpGet]
-        public IActionResult Post()
+        public IActionResult ShowInsertPopup()
         {
-            return View();
+            var model = new MODELProduct(); // Model mới để thêm sản phẩm
+            return PartialView("~/Views/Product/PopupDetail.cshtml", model);
         }
 
-        [HttpPost]
-        public IActionResult Post(ProductVM model)
+        [HttpGet]
+        public IActionResult ShowUpdatePopup(Guid id)
         {
             try
             {
-                string data = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    TempData["successMessage"] = "Thêm sản phẩm thành công";
-                    return RedirectToAction("Index");
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }
-            return View();
-        }
-        #endregion
-
-        #region UPDATE
-        [HttpGet]
-        public IActionResult Update(Guid id)
-        {
-            try
-            {
-                ProductVM product = new ProductVM();
+                MODELProduct obj = new MODELProduct();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
+                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
                 }
-                return View(product);
 
+                // Trả về PartialView thay vì View
+                return PartialView("~/Views/Product/PopupDetail.cshtml", obj);
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
-                return View();
+
+                // Trả về PartialView rỗng để tránh lỗi modal
+                return PartialView("~/Views/Product/PopupDetail.cshtml");
             }
         }
+
+
         [HttpPost]
-        public IActionResult Update(ProductVM model)
+        public IActionResult Post([FromBody] MODELProduct model)
         {
             try
             {
-                string endpoint = $"/product/Put/{model.Id}"; // Thêm {id} vào URL
+                if (model == null)
+                {
+                    // Trường hợp model bị null hoặc không hợp lệ
+                    return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
+                }
+
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+                HttpResponseMessage response;
 
-                if (response.IsSuccessStatusCode)
+                if (model.Id == Guid.Empty || model.Id == null) // Tạo mới
                 {
-                    TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
-                    return RedirectToAction("Index");
+                    response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = false, message = "Thêm sản phẩm thành công!" });
+                    }
+                }
+                else // Cập nhật
+                {
+                    string endpoint = $"/product/Put/{model.Id}";
+                    response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return Json(new { success = true, data = true, message = "Chỉnh sửa sản phẩm thành công!" });
+                    }
                 }
 
-                return View();
+                // Nếu phản hồi không thành công
+                string errorDetails = response?.Content.ReadAsStringAsync().Result ?? "Không rõ lý do.";
+                return Json(new { success = false, message = $"Yêu cầu không thành công: {errorDetails}" });
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View();
+                // Xử lý lỗi và trả về phản hồi phù hợp
+                return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
         }
-        #endregion
+
+
+        //#region CREATE
+        //[HttpPost]
+        //public IActionResult Post(MODELProduct model)
+        //{
+        //    try
+        //    {
+        //        string data = JsonConvert.SerializeObject(model);
+        //        StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+        //        HttpResponseMessage response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            TempData["successMessage"] = "Thêm sản phẩm thành công";
+        //            return RedirectToAction("Index");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }
+        //    return View();
+        //}
+        //#endregion
+
+        //#region UPDATE
+
+        //[HttpPost]
+        //public IActionResult Update(MODELProduct model)
+        //{
+        //    try
+        //    {
+        //        string endpoint = $"/product/Put/{model.Id}"; // Thêm {id} vào URL
+        //        string data = JsonConvert.SerializeObject(model);
+        //        StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
+
+        //        HttpResponseMessage response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
+
+        //        if (response.IsSuccessStatusCode)
+        //        {
+        //            TempData["successMessage"] = "Chỉnh sửa sản phẩm thành công";
+        //            return RedirectToAction("Index");
+        //        }
+
+        //        return View();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        TempData["errorMessage"] = ex.Message;
+        //        return View();
+        //    }
+        //}
+        //#endregion
 
         #region DELETE
-        [HttpGet]
+        [HttpDelete]
         public IActionResult Delete(Guid id)
         {
             try
             {
-                ProductVM product = new ProductVM();
-                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    product = JsonConvert.DeserializeObject<ProductVM>(data);
-                    return View(product);
-
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["errorMessage"] = ex.Message;
-                return View();
-            }
-            return View();
-        }
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirm(Guid id)
-        {
-            try
-            {
+                // Gửi yêu cầu đến API để xóa sản phẩm
                 HttpResponseMessage response = _client.DeleteAsync(_client.BaseAddress + "/product/Delete/" + id).Result;
+
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["successMessage"] = "Xóa sản phẩm thành công";
-                    return RedirectToAction("Index");
+                    return Json(new { success = true, message = "Xóa sản phẩm thành công!" });
+                }
+                else
+                {
+                    // Đọc thông báo lỗi từ API nếu có
+                    string errorDetails = response.Content.ReadAsStringAsync().Result;
+                    return Json(new { success = false, message = $"Xóa không thành công: {errorDetails}" });
                 }
             }
             catch (Exception ex)
             {
-                TempData["errorMessage"] = ex.Message;
-                return View();
+                // Trả về thông báo lỗi nếu xảy ra ngoại lệ
+                return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
-            return View();
         }
+
         #endregion
     }
 }

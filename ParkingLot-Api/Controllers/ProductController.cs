@@ -2,8 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ParkingLot_Api.Entities;
-using ParkingLot_Api.Model;
-
+using MODELS.DANHMUC;
 namespace ParkingLot_Api.Controllers
 {
     [Route("api/[controller]/[action]")]
@@ -58,8 +57,7 @@ namespace ParkingLot_Api.Controllers
                 if (model.Id == Guid.Empty)
                 {
                     model.Id = Guid.NewGuid();
-                }
-
+                }                
                 _context.Products.Add(model);
                 _context.SaveChanges();
                 return Ok("Sản phẩm đã được tạo");
@@ -71,7 +69,7 @@ namespace ParkingLot_Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(Product model)
+        public IActionResult Put(MODELProduct model)
         {
             try
             {
