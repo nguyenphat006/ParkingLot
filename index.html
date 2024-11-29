@@ -305,89 +305,7 @@
         // Hàm lấy vị trí hiện tại
         function getCurrentLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const coords = {
-                            lng: position.coords.longitude,
-                            lat: position.coords.latitude
-                        };
-    
-                        // Xóa marker cũ nếu có
-                        if (userLocationMarker) {
-                            userLocationMarker.remove();
-                        }
-    
-                        // Tạo marker mới
-                        userLocationMarker = new goongjs.Marker()
-                            .setLngLat(coords)
-                            .addTo(map);
-    
-                        // Di chuyển map đến vị trí hiện tại
-                        map.flyTo({
-                            center: coords,
-                            zoom: 15
-                        });
-    
-                        // Vẽ đường tròn xung quanh vị trí hiện tại (với bán kính m)
-                        const circleCoords = drawCircle([coords.lng, coords.lat], radiusInMeters);
-                        
-                        // Thêm một layer mới để vẽ hình tròn
-                        map.addSource('circle', {
-                            type: 'geojson',
-                            data: {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Polygon',
-                                    coordinates: [circleCoords]
-                                }
-                            }
-                        });
-    
-                        map.addLayer({
-                            id: 'circle-layer',
-                            type: 'fill',
-                            source: 'circle',
-                            layout: {},
-                            paint: {
-                                'fill-color': 'rgba(0, 0, #56aaff, 0.3)',
-                                'fill-outline-color': 'rgba(0, 0, 255, 1)'
-                            }
-                        });
-    
-                        // Gọi API reverse geocoding để lấy thông tin địa điểm
-                        fetch(`https://rsapi.goong.io/Geocode?latlng=${coords.lat},${coords.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.results && data.results[0]) {
-                                    const place = data.results[0];
-                                    
-                                    // Cập nhật thông tin trong sidebar
-                                    document.querySelector('.place-title').textContent = 'Vị trí hiện tại';
-                                    document.querySelector  ('.place-info span').textContent = place.formatted_address;
-    
-                                    // Hiển thị sidebar
-                                    const sidebar = document.getElementById('left');
-                                    sidebar.classList.remove('collapsed');
-                                    const toggleIcon = sidebar.querySelector('.bi');
-                                    toggleIcon.classList.remove('bi-arrow-left');
-                                    toggleIcon.classList.add('bi-arrow-right');
-                                }
-                            });
-                    },
-                    (error) => {
-                        console.error('Lỗi khi lấy vị trí:', error);
-                        alert('Không thể lấy vị trí của bạn. Vui lòng kiểm tra quyền truy cập vị trí.');
-                    }
-                );
-            } else {
-                alert('Trình duyệt của bạn không hỗ trợ định vị.');
-            }
-        }
-
-        // Hàm cập nhật vị trí khi người dùng thay đổi
-        function getCurrentLocationUpdate() {
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(
+                navigator.geolocation.getCurrentPosition (
                     (position) => {
                         const coords = {
                             lng: position.coords.longitude,
@@ -463,13 +381,100 @@
                         alert('Không thể lấy vị trí của bạn. Vui lòng kiểm tra quyền truy cập vị trí.');
                     }
                 );
+                
             } else {
                 alert('Trình duyệt của bạn không hỗ trợ định vị.');
             }
         }
 
-        // Gọi hàm lấy vị trí hiện tại và theo dõi vị trí khi tải trang
-        window.addEventListener('load', getCurrentLocationUpdate);
+        // setInterval(getCurrentLocation, 100)
+
+        // // Hàm cập nhật vị trí khi người dùng thay đổi
+        // function getCurrentLocationUpdate() {
+        //     if (navigator.geolocation) {
+        //         navigator.geolocation.watchPosition(
+        //             (position) => {
+        //                 const coords = {
+        //                     lng: position.coords.longitude,
+        //                     lat: position.coords.latitude
+        //                 };
+    
+        //                 // Xóa marker cũ nếu có
+        //                 if (userLocationMarker) {
+        //                     userLocationMarker.remove();
+        //                 }
+    
+        //                 // Tạo marker mới
+        //                 userLocationMarker = new goongjs.Marker()
+        //                     .setLngLat(coords)
+        //                     .addTo(map);
+    
+        //                 // Di chuyển map đến vị trí hiện tại
+        //                 map.flyTo({
+        //                     center: coords,
+        //                     zoom: 15
+        //                 });
+    
+        //                 // Vẽ đường tròn xung quanh vị trí hiện tại (với bán kính m)
+        //                 const circleCoords = drawCircle([coords.lng, coords.lat], radiusInMeters);
+                        
+        //                 // Thêm một layer mới để vẽ hình tròn
+        //                 map.addSource('circle', {
+        //                     type: 'geojson',
+        //                     data: {
+        //                         type: 'Feature',
+        //                         geometry: {
+        //                             type: 'Polygon',
+        //                             coordinates: [circleCoords]
+        //                         }
+        //                     }
+        //                 });
+    
+        //                 map.addLayer({
+        //                     id: 'circle-layer',
+        //                     type: 'fill',
+        //                     source: 'circle',
+        //                     layout: {},
+        //                     paint: {
+        //                         'fill-color': 'rgba(0, 0, #56aaff, 0.3)',
+        //                         'fill-outline-color': 'rgba(0, 0, 255, 1)'
+        //                     }
+        //                 });
+    
+        //                 // Gọi API reverse geocoding để lấy thông tin địa điểm
+        //                 fetch(`https://rsapi.goong.io/Geocode?latlng=${coords.lat},${coords.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
+        //                     .then(response => response.json())
+        //                     .then(data => {
+        //                         if (data.results && data.results[0]) {
+        //                             const place = data.results[0];
+                                    
+        //                             // Cập nhật thông tin trong sidebar
+        //                             document.querySelector('.place-title').textContent = 'Vị trí hiện tại';
+        //                             document.querySelector  ('.place-info span').textContent = place.formatted_address;
+    
+        //                             // Hiển thị sidebar
+        //                             const sidebar = document.getElementById('left');
+        //                             sidebar.classList.remove('collapsed');
+        //                             const toggleIcon = sidebar.querySelector('.bi');
+        //                             toggleIcon.classList.remove('bi-arrow-left');
+        //                             toggleIcon.classList.add('bi-arrow-right');
+        //                         }
+        //                     });
+
+        //                 calculateRoute();
+        //             },
+        //             (error) => {
+        //                 console.error('Lỗi khi lấy vị trí:', error);
+        //                 alert('Không thể lấy vị trí của bạn. Vui lòng kiểm tra quyền truy cập vị trí.');
+        //             }
+        //         );
+        //     } else {
+        //         alert('Trình duyệt của bạn không hỗ trợ định vị.');
+        //     }
+        // }
+
+        // // Gọi hàm lấy vị trí hiện tại và theo dõi vị trí khi tải trang
+        // window.addEventListener('load', getCurrentLocationUpdate);
         
         //Khai báo bán kính
         const radiusInMeters = 1000;  // Bán kính vòng tròn trong đơn vị mét
@@ -499,7 +504,7 @@
         // Thêm sự kiện click cho nút định vị
         document.getElementById('geolocate').addEventListener('click', getCurrentLocation);
     
-        // Tự động lấy vị trí khi trang web được tảix
+        // Tự động lấy vị trí khi trang web được tải
         window.addEventListener('load', getCurrentLocation);
     
         let destination = null; // Lưu tọa độ điểm đến
