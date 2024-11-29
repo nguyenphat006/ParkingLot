@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>MAP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Goong Maps -->
+    <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@goongmaps/goong-js@1.0.9/dist/goong-js.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.5.1/mapbox-gl.css" rel="stylesheet" />
+    <link hrel='stylesheet' href='https://unpkg.com/maplibre-gl/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl/dist/maplibre-gl.js'></script>
+</head>
+
+<body>
+    <div class="container-fluid p-0">
+        <div id="map">
+            <div class="geocoder-container" id="geocoder"></div>
+
+            <div id="menu">
+                <div class="map-control-group">
+                    <button class="map-control-button" id="mapType" title="Thay đổi kiểu bản đồ">
+                        <i class="bi bi-layers"></i>
+                    </button>
+                    <button class="map-control-button" onclick="toggleFullscreen()" title="Toàn màn hình">
+                        <i class="bi bi-fullscreen"></i>
+                    </button>
+                    <button class="map-control-button" id="geolocate" title="Vị trí của tôi">
+                        <i class="bi bi-geo-alt"></i>
+                    </button>
+                </div>
+
+                <div id="mapTypeDropdown" class="map-control-group">
+                    <button class="map-control-button active" data-style="https://tiles.goong.io/assets/goong_map_web.json">
+                        <i class="bi bi-sun"></i> Light
+                    </button>
+                    <button class="map-control-button" data-style="https://tiles.goong.io/assets/goong_map_dark.json">
+                        <i class="bi bi-moon"></i> Dark
+                    </button>
+                    <button class="map-control-button" data-style="https://tiles.goong.io/assets/navigation_day.json">
+                        <i class="bi bi-compass"></i> Navigation
+                    </button>
+                    <button class="map-control-button" data-style="https://tiles.goong.io/assets/navigation_night.json">
+                        <i class="bi bi-compass-fill"></i> Night Nav
+                    </button>
+                </div>
+            </div>
+
+            <div id="left" class="sidebar collapsed">
+                <div class="sidebar-header">
+                    <button class="btn-icon" onclick="toggleSidebar('left')" aria-label="Toggle sidebar">
+                        <i class="bi bi-arrow-left"></i>
+                    </button>
+                    <span class="ms-3">Thông tin địa điểm</span>
+                </div>
+                <div class="sidebar-content">
+                    <div class="place-details">
+                        <img src="https://via.placeholder.com/400x200" alt="Place Image" class="place-image">
+                        <h1 class="place-title">Bình Hưng Hòa</h1>
+
+                        <div class="place-info-buttons d-flex justify-content-between mt-4">
+                            <div class="text-center button-container">
+                                <button class="btn btn-circle btn-primary" id="routeButton">
+                                    <i class="bi bi-signpost-split"></i>
+                                </button>
+                                <p class="mt-2 button-label">Đường đi</p>
+                            </div>
+                            <div class="text-center button-container">
+                                <button class="btn btn-circle btn-outline-primary">
+                                    <i class="bi bi-bookmark"></i>
+                                </button>
+                                <p class="mt-2 button-label">Lưu</p>
+                            </div>
+                            <div class="text-center button-container">
+                                <button class="btn btn-circle btn-outline-primary">
+                                    <i class="bi bi-geo-alt"></i>
+                                </button>
+                                <p class="mt-2 button-label">Gần đó</p>
+                            </div>
+                            <div class="text-center button-container">
+                                <button class="btn btn-circle btn-outline-primary">
+                                    <i class="bi bi-phone"></i>
+                                </button>
+                                <p class="mt-2 button-label">Gửi tới <br> điện thoại</p>
+                            </div>
+                            <div class="text-center button-container">
+                                <button class="btn btn-circle btn-outline-primary" id="shareButton">
+                                    <i class="bi bi-share"></i>
+                                </button>
+                                <p class="mt-2 button-label">Chia sẻ</p>
+                            </div>
+                        </div>
+
+                        <div class="place-info">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>123 Đường ABC, Quận XYZ, TP.HCM</span>
+                        </div>
+
+                        <div class="place-info">
+                            <i class="bi bi-telephone"></i>
+                            <span>(+84) 123-456-789</span>
+                        </div>
+
+                        <div class="place-info">
+                            <i class="bi bi-clock"></i>
+                            <span>Mở cửa: 8:00 - 22:00</span>
+                        </div>
+
+                        <div class="custom-line"></div>
+
+                        <div class="place-info">
+                            <i class="bi bi-info-circle"></i>
+                            <span>Thông tin chi tiết về địa điểm này sẽ được cập nhật sau.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Map initialization
+        goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
+        const map = new goongjs.Map({
+            container: 'map',
+            style: 'https://tiles.goong.io/assets/goong_map_web.json',
+            center: [105.84478, 21.02897],
+            zoom: 13
+        });
+    
+        // Add map controls
+        map.addControl(new goongjs.NavigationControl(), 'top-right');
+        map.addControl(new goongjs.FullscreenControl(), 'top-right');
+    
+        // Initialize geocoder
+        const geocoder = new GoongGeocoder({
+            accessToken: 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW',
+            goongjs: goongjs
+        });
+        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+    
+        // Sidebar toggle function
+        function toggleSidebar(id) {
+            const elem = document.getElementById(id);
+            const toggleIcon = elem.querySelector('.bi');
+            const collapsed = elem.classList.contains('collapsed');
+    
+            if (collapsed) {
+                elem.classList.remove('collapsed');
+                toggleIcon.classList.remove('bi-arrow-left');
+                toggleIcon.classList.add('bi-arrow-right');
+            } else {
+                elem.classList.add('collapsed');
+                toggleIcon.classList.remove('bi-arrow-right');
+                toggleIcon.classList.add('bi-arrow-left');
+            }
+        }
+    
+        // Map type dropdown toggle
+        document.getElementById('mapType').addEventListener('click', function (event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('mapTypeDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+        });
+    
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('mapTypeDropdown');
+            const mapTypeBtn = document.getElementById('mapType');
+    
+            if (!mapTypeBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    
+        // Handle map style selection
+        document.querySelectorAll('#mapTypeDropdown .map-control-button').forEach(button => {
+            button.addEventListener('click', function () {
+                // Remove active class from all buttons
+                document.querySelectorAll('#mapTypeDropdown .map-control-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+    
+                // Add active class to clicked button
+                this.classList.add('active');
+    
+                // Change map style
+                const style = this.dataset.style;
+                map.setStyle(style);
+    
+                // Hide dropdown
+                document.getElementById('mapTypeDropdown').style.display = 'none';
+            });
+        });
+    
+        // Fullscreen toggle function
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    
+        // Handle fullscreen change
+        document.addEventListener('fullscreenchange', function () {
+            const fullscreenBtn = document.querySelector('[onclick="toggleFullscreen()"] i');
+            if (document.fullscreenElement) {
+                fullscreenBtn.classList.remove('bi-fullscreen');
+                fullscreenBtn.classList.add('bi-fullscreen-exit');
+            } else {
+                fullscreenBtn.classList.remove('bi-fullscreen-exit');
+                fullscreenBtn.classList.add('bi-fullscreen');
+            }
+        });
+    
+        // Thêm đoạn code này vào phần script ở cuối file, sau phần khởi t��o map
+        // ... existing map initialization code ...
+    
+    
+        // Thêm biến để lưu marker hiện tại ở đầu file script
+        let currentMarker = null;
+    
+        // Sửa lại sự kiện click vào map
+        map.on('click', function (e) {
+            // Lấy tọa độ điểm được click
+            const coordinates = e.lngLat;
+    
+            // Xóa marker cũ nếu có
+            if (currentMarker) {
+                currentMarker.remove();
+            }
+    
+            // Tạo marker mới và lưu lại
+            currentMarker = new goongjs.Marker()
+                .setLngLat(coordinates)
+                .addTo(map);
+    
+            // Gọi API reverse geocoding để lấy thông tin địa điểm
+            fetch(`https://rsapi.goong.io/Geocode?latlng=${coordinates.lat},${coordinates.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.results && data.results[0]) {
+                        const place = data.results[0];
+    
+                        // Cập nhật thông tin trong sidebar
+                        // Viết mã để lấy ảnh từ goong ở bên trên thêm vào .place-details img
+                        document.querySelector('.place-title').textContent = place.formatted_address;
+                        document.querySelector('.place-info span').textContent = place.formatted_address;
+    
+                        // Hiển thị sidebar
+                        const sidebar = document.getElementById('left');
+                        sidebar.classList.remove('collapsed');
+                        const toggleIcon = sidebar.querySelector('.bi');
+                        toggleIcon.classList.remove('bi-arrow-left');
+                        toggleIcon.classList.add('bi-arrow-right');
+                    }
+                });
+        });
+    
+        // Sửa lại sự kiện khi chọn địa điểm từ geocoder
+        geocoder.on('result', function (e) {
+            const result = e.result;
+    
+            // Xóa marker cũ nếu có
+            if (currentMarker) {
+                currentMarker.remove();
+            }
+    
+            // Tạo marker mới và lưu lại
+            currentMarker = new goongjs.Marker()
+                .setLngLat(result.geometry.coordinates)
+                .addTo(map);
+    
+            // Cập nhật thông tin trong sidebar
+            document.querySelector('.place-title').textContent = result.name || result.formatted_address;
+            document.querySelector('.place-info span').textContent = result.formatted_address;
+    
+            // Hiển thị sidebar
+            const sidebar = document.getElementById('left');
+            sidebar.classList.remove('collapsed');
+            const toggleIcon = sidebar.querySelector('.bi');
+            toggleIcon.classList.remove('bi-arrow-left');
+            toggleIcon.classList.add('bi-arrow-right');
+        });
+    
+        // Thêm vào sau phần khởi tạo map
+        // Khởi tạo marker vị trí hiện tại
+        let userLocationMarker = null;
+    
+        // Hàm lấy vị trí hiện tại
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = {
+                            lng: position.coords.longitude,
+                            lat: position.coords.latitude
+                        };
+    
+                        // Xóa marker cũ nếu có
+                        if (userLocationMarker) {
+                            userLocationMarker.remove();
+                        }
+    
+                        // Tạo marker mới
+                        userLocationMarker = new goongjs.Marker()
+                            .setLngLat(coords)
+                            .addTo(map);
+    
+                        // Di chuyển map đến vị trí hiện tại
+                        map.flyTo({
+                            center: coords,
+                            zoom: 15
+                        });
+    
+                        // Vẽ đường tròn xung quanh vị trí hiện tại (với bán kính m)
+                        const circleCoords = drawCircle([coords.lng, coords.lat], radiusInMeters);
+                        
+                        // Thêm một layer mới để vẽ hình tròn
+                        map.addSource('circle', {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [circleCoords]
+                                }
+                            }
+                        });
+    
+                        map.addLayer({
+                            id: 'circle-layer',
+                            type: 'fill',
+                            source: 'circle',
+                            layout: {},
+                            paint: {
+                                'fill-color': 'rgba(0, 0, #56aaff, 0.3)',
+                                'fill-outline-color': 'rgba(0, 0, 255, 1)'
+                            }
+                        });
+    
+                        // Gọi API reverse geocoding để lấy thông tin địa điểm
+                        fetch(`https://rsapi.goong.io/Geocode?latlng=${coords.lat},${coords.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.results && data.results[0]) {
+                                    const place = data.results[0];
+                                    
+                                    // Cập nhật thông tin trong sidebar
+                                    document.querySelector('.place-title').textContent = 'Vị trí hiện tại';
+                                    document.querySelector  ('.place-info span').textContent = place.formatted_address;
+    
+                                    // Hiển thị sidebar
+                                    const sidebar = document.getElementById('left');
+                                    sidebar.classList.remove('collapsed');
+                                    const toggleIcon = sidebar.querySelector('.bi');
+                                    toggleIcon.classList.remove('bi-arrow-left');
+                                    toggleIcon.classList.add('bi-arrow-right');
+                                }
+                            });
+                    },
+                    (error) => {
+                        console.error('Lỗi khi lấy vị trí:', error);
+                        alert('Không thể lấy vị trí của bạn. Vui lòng kiểm tra quyền truy cập vị trí.');
+                    }
+                );
+            } else {
+                alert('Trình duyệt của bạn không hỗ trợ định vị.');
+            }
+        }
+
+        // Hàm cập nhật vị trí khi người dùng thay đổi
+        function getCurrentLocationUpdate() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(
+                    (position) => {
+                        const coords = {
+                            lng: position.coords.longitude,
+                            lat: position.coords.latitude
+                        };
+    
+                        // Xóa marker cũ nếu có
+                        if (userLocationMarker) {
+                            userLocationMarker.remove();
+                        }
+    
+                        // Tạo marker mới
+                        userLocationMarker = new goongjs.Marker()
+                            .setLngLat(coords)
+                            .addTo(map);
+    
+                        // Di chuyển map đến vị trí hiện tại
+                        map.flyTo({
+                            center: coords,
+                            zoom: 15
+                        });
+    
+                        // Vẽ đường tròn xung quanh vị trí hiện tại (với bán kính m)
+                        const circleCoords = drawCircle([coords.lng, coords.lat], radiusInMeters);
+                        
+                        // Thêm một layer mới để vẽ hình tròn
+                        map.addSource('circle', {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [circleCoords]
+                                }
+                            }
+                        });
+    
+                        map.addLayer({
+                            id: 'circle-layer',
+                            type: 'fill',
+                            source: 'circle',
+                            layout: {},
+                            paint: {
+                                'fill-color': 'rgba(0, 0, #56aaff, 0.3)',
+                                'fill-outline-color': 'rgba(0, 0, 255, 1)'
+                            }
+                        });
+    
+                        // Gọi API reverse geocoding để lấy thông tin địa điểm
+                        fetch(`https://rsapi.goong.io/Geocode?latlng=${coords.lat},${coords.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.results && data.results[0]) {
+                                    const place = data.results[0];
+                                    
+                                    // Cập nhật thông tin trong sidebar
+                                    document.querySelector('.place-title').textContent = 'Vị trí hiện tại';
+                                    document.querySelector  ('.place-info span').textContent = place.formatted_address;
+    
+                                    // Hiển thị sidebar
+                                    const sidebar = document.getElementById('left');
+                                    sidebar.classList.remove('collapsed');
+                                    const toggleIcon = sidebar.querySelector('.bi');
+                                    toggleIcon.classList.remove('bi-arrow-left');
+                                    toggleIcon.classList.add('bi-arrow-right');
+                                }
+                            });
+
+                        calculateRoute();
+                    },
+                    (error) => {
+                        console.error('Lỗi khi lấy vị trí:', error);
+                        alert('Không thể lấy vị trí của bạn. Vui lòng kiểm tra quyền truy cập vị trí.');
+                    }
+                );
+            } else {
+                alert('Trình duyệt của bạn không hỗ trợ định vị.');
+            }
+        }
+
+        // Gọi hàm lấy vị trí hiện tại và theo dõi vị trí khi tải trang
+        window.addEventListener('load', getCurrentLocationUpdate);
+        
+        //Khai báo bán kính
+        const radiusInMeters = 1000;  // Bán kính vòng tròn trong đơn vị mét
+    
+        // Hàm vẽ đường tròn xung quanh vị trí
+        function drawCircle(center, radiusInMeters) {
+            const points = 64;  // Số điểm để vẽ hình tròn
+            const coords = {
+                latitude: center[1],
+                longitude: center[0]
+            };
+            const km = radiusInMeters / 1000;  // Chuyển đổi bán kính sang km
+            const ret = [];
+            const distanceX = km / (111.320 * Math.cos(coords.latitude * Math.PI / 180));
+            const distanceY = km / 110.574;
+            let theta, x, y;
+            for (let i = 0; i < points; i++) {
+                theta = (i / points) * (2 * Math.PI);
+                x = distanceX * Math.cos(theta);
+                y = distanceY * Math.sin(theta);
+                ret.push([coords.longitude + x, coords.latitude + y]);
+            }
+            ret.push(ret[0]);  // Đóng vòng tròn
+            return ret;
+        }
+    
+        // Thêm sự kiện click cho nút định vị
+        document.getElementById('geolocate').addEventListener('click', getCurrentLocation);
+    
+        // Tự động lấy vị trí khi trang web được tảix
+        window.addEventListener('load', getCurrentLocation);
+    
+        let destination = null; // Lưu tọa độ điểm đến
+    
+        // Hàm tính toán và hiển thị đường đi
+        function calculateRoute() {
+            if (!userLocationMarker) {
+                alert("Không thể lấy vị trí hiện tại. Vui lòng thử lại.");
+                return;
+            }
+            if (!destination) {
+                alert("Bạn chưa chọn điểm đến.");
+                return;
+            }
+    
+            // Lấy tọa độ vị trí hiện tại và điểm đến
+            const currentLocation = userLocationMarker.getLngLat();
+            const startCoords = `${currentLocation.lat},${currentLocation.lng}`;
+            const endCoords = `${destination.lat},${destination.lng}`;
+            const apiLink = `https://rsapi.goong.io/direction?origin=${startCoords}&destination=${endCoords}&vehicle=car&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`;
+    
+            // Gọi API lấy lộ trình
+            fetch(apiLink)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.routes && data.routes.length > 0) {
+                        const route = data.routes[0].overview_polyline.points;
+                        const distance = data.routes[0].legs[0].distance.text;
+                        const time = data.routes[0].legs[0].duration.text;
+    
+                        // Giải mã polyline thành danh sách tọa độ
+                        const decodedRoute = decodePolyline(route);
+    
+                        // Xóa dữ liệu lộ trình cũ nếu có
+                        if (map.getSource('route')) {
+                        map.removeLayer('route');
+                        map.removeSource('route');
+                        }
+    
+                        // Thêm lộ trình vào bản đồ
+                        map.addSource('route', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': decodedRoute
+                            }
+                        }
+                        });
+    
+                        map.addLayer({
+                        'id': 'route',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#3887be',
+                            'line-width': 5,
+                            'line-opacity': 0.9
+                        }
+                        });
+                    } else {
+                        alert('Không thể tìm thấy lộ trình.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi gọi Goong API:', error);
+                    alert('Không thể lấy thông tin địa điểm.');
+                });
+    
+            // Hàm giải mã polyline
+            function decodePolyline(encoded) {
+                const points = [];
+                let index = 0, len = encoded.length;
+                let lat = 0, lng = 0;
+    
+                while (index < len) {
+                    let b, shift = 0, result = 0;
+    
+                    do {
+                        b = encoded.charCodeAt(index++) - 63;
+                        result |= (b & 0x1f) << shift;
+                        shift += 5;
+                    } while (b >= 0x20);
+    
+                    const dlat = (result & 1) ? ~(result >> 1) : (result >> 1);
+                    lat += dlat;
+    
+                    shift = 0;
+                    result = 0;
+    
+                    do {
+                        b = encoded.charCodeAt(index++) - 63;
+                        result |= (b & 0x1f) << shift;
+                        shift += 5;
+                    } while (b >= 0x20);
+    
+                    const dlng = (result & 1) ? ~(result >> 1) : (result >> 1);
+                    lng += dlng;
+    
+                    points.push([lng * 1e-5, lat * 1e-5]);
+                }
+    
+                return points;
+            }
+        }
+    
+        // Để chọn điểm đến (giả sử khi click trên bản đồ)
+        map.on("click", (e) => {
+            destination = {
+                lat: e.lngLat.lat,
+                lng: e.lngLat.lng,
+            };
+            console.log("Điểm đến đã chọn:", destination);
+        });
+    
+        // Gắn sự kiện cho nút "Đường đi"
+        document.getElementById("routeButton").addEventListener("click", calculateRoute);
+    
+        // Gọi hàm lấy vị trí hiện tại khi tải trang
+        window.addEventListener("load", getCurrentLocation);
+    </script>
+</body>
+
+</html>
