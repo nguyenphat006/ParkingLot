@@ -1,6 +1,7 @@
 ﻿@model MODELS.DANHMUC.MODELProduct
 @{
     ViewData["Title"] = "PopupDetail";
+    var parkingList = ViewBag.ParkingCombobox as List<dynamic>;
 }
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmProduct", @class = "forms-sample" }))
@@ -12,12 +13,14 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopUp()"></button>
     </div>
     <div class="modal-body">
-        <div class="mb-3">
-            <label class="col-form-label">
-                Tên sản phẩm
-            </label>
-            @Html.TextBoxFor(model => model.Name, new { @class = "form-control", id = "Name" })
-        </div>
+        
+        <div class="form-group">
+            <div class="mb-3">
+                <label class="col-form-label">
+                    Tên sản phẩm
+                </label>
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control", id = "Name" })
+            </div>
         <div class="mb-3">
             <label class="col-form-label">
                 Giá tiền
@@ -29,6 +32,26 @@
                 Số lượng
             </label>
             @Html.TextBoxFor(model => model.Quantity, new { @class = "form-control", id = "Quantity" })
+
+                <div class="col-sm-6 col-lg-5 mb-3 mb-sm-0">
+                    <div class="time-picker" data-coreui-locale="en-US" data-coreui-toggle="time-picker" id="timePicker1"></div>
+                </div>
+
+        </div>
+           <div class="mb-3">
+                <label for="parkingSelect">Chọn bãi đậu xe:</label>
+                <select id="parkingSelect" name="parkingId" class="form-control">
+                    <option value="">-- Chọn bãi đậu xe --</option>
+                    @if (parkingList != null)
+                    {
+                        foreach (var parking in parkingList)
+                        {
+                            <option value="@parking.Id">@parking.Name</option>
+                        }
+                    }
+                </select>
+            </div>
+
         </div>
     </div>
     <div class="modal-footer">

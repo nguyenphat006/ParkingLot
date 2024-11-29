@@ -1,1 +1,1 @@
-Scaffold-DbContext "Data Source=.......;Initial Catalog=ParkingLot;Integrated Security=True;Trust Server Certificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context MyDbContext -f
+Scaffold-DbContext "Data Source=ERICSS;Initial Catalog=ParkingLot;Integrated Security=True;Trust Server Certificate=True" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context MyDbContext -f

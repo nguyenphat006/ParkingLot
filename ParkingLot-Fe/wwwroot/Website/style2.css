@@ -1,3 +1,22 @@
-﻿.paginate_button {
+﻿
+.paginate_button {
     margin-right: 5px !important;
+}
+
+.dataTables_length{
+    display: flex;
+   align-items: center;
+    margin-left: auto;
+}
+.table > tbody > tr > td, .table > tbody > tr > th{
+    padding: 5px 10px 5px 10px !important;
+}
+.table thead th{
+    text-transform: unset !important;
+}
+.dataTables_paginate{
+    margin-left: 15px !important;
+}
+.card-header{
+    border-bottom: 1px solid #ccc !important;
 }

@@ -42,7 +42,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Parking}/{action=Login}/{id?}");
 
 app.UseEndpoints(endpoints =>
 {
@@ -54,7 +54,7 @@ app.UseEndpoints(endpoints =>
     // Route mặc định
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Admin}/{action=Index}/{id?}");
+        pattern: "{controller=Parking}/{action=Index}/{id?}");
 });
 
 

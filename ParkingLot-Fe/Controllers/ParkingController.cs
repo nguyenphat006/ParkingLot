@@ -1,49 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using ParkingLot_Fe.Models;
-using System.Text;
 using MODELS.DANHMUC;
-using MODELS.BASE;
 using MODELS.NGHIEPVU;
+using Newtonsoft.Json;
+using System.Text;
+
 namespace ParkingLot_Fe.Controllers
 {
-    public class ProductController : Controller
+    public class ParkingController : Controller
     {
         Uri baseAddress = new Uri("https://localhost:7167/api");
         private readonly HttpClient _client;
-        public ProductController()
+
+        public ParkingController()
         {
             _client = new HttpClient();
             _client.BaseAddress = baseAddress;
         }
-
         [HttpGet]
         public IActionResult Index()
         {
-            List<MODELProduct> productsList = new List<MODELProduct>();
-            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetAll").Result;
+            List<MODELParking> parkinglist = new List<MODELParking>();
+            HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetAll").Result;
             if (response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
-                productsList = JsonConvert.DeserializeObject<List<MODELProduct>>(data);
+                parkinglist = JsonConvert.DeserializeObject<List<MODELParking>>(data);
             }
-            return View(productsList);
+            return View(parkinglist);
         }
-        
+
         [HttpGet]
         public IActionResult ShowViewPopup(Guid id)
         {
             try
             {
-                MODELProduct obj = new MODELProduct();
-                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
+                MODELParking obj = new MODELParking();
+                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
+                    obj = JsonConvert.DeserializeObject<MODELParking>(data);
                 }
-                return PartialView("~/Views/Product/PopupView.cshtml", obj); // Trả về PartialView
+                return PartialView("~/Views/Parking/PopupView.cshtml", obj); // Trả về PartialView
             }
             catch (Exception ex)
             {
@@ -52,12 +51,11 @@ namespace ParkingLot_Fe.Controllers
             }
         }
 
-
         [HttpGet]
         public IActionResult ShowInsertPopup()
         {
-            var model = new MODELProduct(); // Model mới để thêm sản phẩm
-            return PartialView("~/Views/Product/PopupDetail.cshtml", model);
+            var model = new MODELParking(); // Model mới để thêm sản phẩm
+            return PartialView("~/Views/Parking/PopupDetail.cshtml", model);
         }
 
         [HttpGet]
@@ -65,30 +63,29 @@ namespace ParkingLot_Fe.Controllers
         {
             try
             {
-                MODELProduct obj = new MODELProduct();
-                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/product/GetById/" + id).Result;
+                MODELParking obj = new MODELParking();
+                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetById/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    obj = JsonConvert.DeserializeObject<MODELProduct>(data);
+                    obj = JsonConvert.DeserializeObject<MODELParking>(data);
                 }
 
                 // Trả về PartialView thay vì View
-                return PartialView("~/Views/Product/PopupDetail.cshtml", obj);
+                return PartialView("~/Views/Parking/PopupDetail.cshtml", obj);
             }
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
 
                 // Trả về PartialView rỗng để tránh lỗi modal
-                return PartialView("~/Views/Product/PopupDetail.cshtml");
+                return PartialView("~/Views/Parking/PopupDetail.cshtml");
             }
         }
 
-
         [HttpPost]
-        public IActionResult Post([FromBody] MODELProduct model)
+        public IActionResult Post([FromBody] MODELParking model)
         {
             try
             {
@@ -105,21 +102,21 @@ namespace ParkingLot_Fe.Controllers
 
                 if (model.Id == Guid.Empty || model.Id == null) // Tạo mới
                 {
-                    response = _client.PostAsync(_client.BaseAddress + "/product/Post", content).Result;
+                    response = _client.PostAsync(_client.BaseAddress + "/parking/Post", content).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return Json(new { success = true, data = false, message = "Thêm sản phẩm thành công!" });
+                        return Json(new { success = true, data = false, message = "Thêm bãi đậu xe thành công!" });
                     }
                 }
                 else // Cập nhật
                 {
-                    string endpoint = $"/product/Put/{model.Id}";
+                    string endpoint = $"/parking/Put/{model.Id}";
                     response = _client.PutAsync(_client.BaseAddress + endpoint, content).Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return Json(new { success = true, data = true, message = "Chỉnh sửa sản phẩm thành công!" });
+                        return Json(new { success = true, data = true, message = "Chỉnh sửa bãi đậu xe thành công!" });
                     }
                 }
 
@@ -133,18 +130,18 @@ namespace ParkingLot_Fe.Controllers
                 return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
         }
-             
+
         [HttpDelete]
         public IActionResult Delete(Guid id)
         {
             try
             {
                 // Gửi yêu cầu đến API để xóa sản phẩm
-                HttpResponseMessage response = _client.DeleteAsync(_client.BaseAddress + "/product/Delete/" + id).Result;
+                HttpResponseMessage response = _client.DeleteAsync(_client.BaseAddress + "/parking/Delete/" + id).Result;
 
                 if (response.IsSuccessStatusCode)
                 {
-                    return Json(new { success = true, message = "Xóa sản phẩm thành công!" });
+                    return Json(new { success = true, message = "Xóa bãi đậu xe thành công!" });
                 }
                 else
                 {
@@ -159,55 +156,5 @@ namespace ParkingLot_Fe.Controllers
                 return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
         }
-
-
-        //[HttpGet]
-        //public IActionResult GetComboBox()
-        //{
-        //    List<MODELParking> parkingList = new List<MODELParking>();
-        //    HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetForComboBox").Result;
-
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        string data = response.Content.ReadAsStringAsync().Result;
-        //        parkingList = JsonConvert.DeserializeObject<List<MODELParking>>(data);
-        //    }
-
-        //    return View(parkingList);
-        //}
-
-
-        [HttpGet]
-        public IActionResult GetForComboBox()
-        {
-            try
-            {
-                HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetForComboBox").Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-
-                    // Deserialize dữ liệu thành danh sách các item combobox
-                    var comboBoxData = JsonConvert.DeserializeObject<List<dynamic>>(data);
-
-                    // Truyền dữ liệu vào ViewBag
-                    ViewBag.ParkingCombobox = comboBoxData;
-                }
-                else
-                {
-                    ViewBag.ParkingCombobox = new List<dynamic>();
-                }
-            }
-            catch (Exception)
-            {
-                ViewBag.ParkingCombobox = new List<dynamic>();
-            }
-
-            return View();
-        }
-
-
-
     }
 }

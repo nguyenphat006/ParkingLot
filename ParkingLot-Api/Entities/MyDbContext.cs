@@ -129,6 +129,7 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Province).HasMaxLength(120);
             entity.Property(e => e.UpdateBy).HasMaxLength(256);
             entity.Property(e => e.UpdateDate).HasColumnType("datetime");
+            entity.Property(e => e.Ward).HasMaxLength(120);
         });
 
         modelBuilder.Entity<ParkingSlot>(entity =>

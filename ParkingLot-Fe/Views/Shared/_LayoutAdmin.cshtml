@@ -15,12 +15,13 @@
     <link rel="stylesheet" href="~/Website/assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/Website/assets/css/plugins.min.css" />
     <link rel="stylesheet" href="~/Website/assets/css/kaiadmin.min.css" />
-    <link rel="stylesheet" href="~/Website/assets/css/kaiadmin.min.css" />
-    <link rel="stylesheet" href="~/Website/style2.css" />
+    <link rel="stylesheet" href="~/Website/style2.css" />   
 
     <!-- CSS Just for demo purpose, don't include it in your project -->
     <link rel="stylesheet" href="~/Website/assets/css/demo.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" />
+    <script src='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.js'></script>
+     <link href='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.css' rel='stylesheet' />
 </head>
 <body>
     <div class="wrapper">
@@ -275,26 +276,36 @@
 
     <script>
         
-        // $(document).ready(function () {
-        //     if (!$.fn.DataTable.isDataTable('#add-row')) {
-        //         $('#add-row').DataTable({
-        //             language: {
-        //                 lengthMenu: "Hiển thị _MENU_ mục",
-        //                 zeroRecords: "Không tìm thấy dữ liệu",
-        //                 info: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
-        //                 infoEmpty: "Không có mục nào để hiển thị",
-        //                 infoFiltered: "(được lọc từ _MAX_ mục)",
-        //                 search: "Tìm kiếm:",
-        //                 paginate: {
-        //                     first: "Đầu",
-        //                     last: "Cuối",
-        //                     next: "Tiếp",
-        //                     previous: "Trước"
-        //                 }
-        //             }
-        //         });
-        //     }
-        // });
+        $(document).ready(function () {
+            if (!$.fn.DataTable.isDataTable('#add-row')) {
+                $('#add-row').DataTable({
+                    language: {
+                        lengthMenu: "Hiển thị _MENU_ mục",
+                        zeroRecords: "Không tìm thấy dữ liệu",
+                        info: "Hiển thị _START_ đến _END_ của _TOTAL_ mục",
+                        infoEmpty: "Không có mục nào để hiển thị",
+                        infoFiltered: "(được lọc từ _MAX_ mục)",
+                        search: "Tìm kiếm:",
+                        paginate: {
+                            first: "Đầu",
+                            last: "Cuối",
+                            next: "Tiếp",
+                            previous: "Trước"
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#add-row').DataTable({
+            dom: '<"top"rt><"bottom d-flex justify-content-between"ilp><"clear">',
+            paging: true,
+            searching: true,
+            info: true,
+            lengthChange: true,
+        });
+
+        $.fn.dataTable.ext.errMode = 'none';
 
 
         $(document).ready(function () {
@@ -366,21 +377,21 @@
             }
         }
 
-        goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
-        const map = new goongjs.Map({
-            container: 'map',
-            style: 'https://tiles.goong.io/assets/goong_map_web.json',
-            center: [105.84478, 21.02897],
-            zoom: 13
-        });
-        map.addControl(new goongjs.NavigationControl(), 'top-right');
-        map.addControl(new goongjs.FullscreenControl(), 'top-right');
+        // goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
+        // const map = new goongjs.Map({
+        //     container: 'map',
+        //     style: 'https://tiles.goong.io/assets/goong_map_web.json',
+        //     center: [105.84478, 21.02897],
+        //     zoom: 13
+        // });
+        // map.addControl(new goongjs.NavigationControl(), 'top-right');
+        // map.addControl(new goongjs.FullscreenControl(), 'top-right');
 
-        const geocoder = new GoongGeocoder({
-            accessToken: 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW',
-            goongjs: goongjs
-        });
-        document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+        // const geocoder = new GoongGeocoder({
+        //     accessToken: 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW',
+        //     goongjs: goongjs
+        // });
+        // document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
     </script>
 
 

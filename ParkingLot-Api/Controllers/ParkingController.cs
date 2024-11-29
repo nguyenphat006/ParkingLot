@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MODELS.BASE;
+using MODELS;
 using MODELS.DANHMUC;
 using MODELS.NGHIEPVU;
 using ParkingLot_Api.Entities;
@@ -21,16 +23,16 @@ namespace ParkingLot_Api.Controllers
             try
             {
                 // Lấy danh sách các Parking mà IsDelete == false
-                var parkings = _context.Parkings
-                    .Where(p => p.IsDeleted == false) // Chỉ lấy những bản ghi có IsDelete == false
+                var obj = _context.Parkings
+                    .Where(p => p.IsDeleted == false && p.IsActive == true) // Chỉ lấy những bản ghi có IsDelete == false
                     .ToList();
 
-                if (parkings.Count == 0)
+                if (obj.Count == 0)
                 {
                     return NotFound("Không có dữ liệu");
                 }
 
-                return Ok(parkings);
+                return Ok(obj);
             }
             catch (Exception ex)
             {
@@ -43,12 +45,12 @@ namespace ParkingLot_Api.Controllers
         {
             try
             {
-                var parkings = _context.Parkings.Find(id);
-                if (parkings == null || parkings.IsDeleted == true)
+                var obj = _context.Parkings.Find(id);
+                if (obj == null || obj.IsDeleted == true || obj.IsActive == true)
                 {
-                    return NotFound($"Không tìm thấy sản phẩm có mã {parkings.ParkingCode}");
+                    return NotFound($"Không tìm thấy bãi đậu xe có mã {obj.ParkingCode}");
                 }
-                return Ok(parkings);
+                return Ok(obj);
             }
             catch (Exception ex)
             {
@@ -71,6 +73,7 @@ namespace ParkingLot_Api.Controllers
                 model.OpenTime = TimeOnly.MinValue;
                 model.CloseTime = TimeOnly.MaxValue;
                 model.IsDeleted = false;
+                model.IsActive = true;
                 _context.Parkings.Add(model);
                 _context.SaveChanges();
                 return Ok("Bãi đậu xe đã được tạo");
@@ -82,34 +85,34 @@ namespace ParkingLot_Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(MODELParking model)
+        public IActionResult Put(MODELParking request)
         {
             try
             {
-                if (model == null || model.Id == Guid.Empty)
+                if (request == null || request.Id == Guid.Empty)
                 {
-                    if (model == null || model.IsDeleted == true)
+                    if (request == null || request.IsDeleted == true)
                     {
                         return BadRequest("Dữ liệu không tồn tại");
                     }
-                    else if (model.Id == Guid.Empty)
+                    else if (request.Id == Guid.Empty)
                     {
                         return BadRequest("Bãi đậu xe không tồn tại");
                     }
                 }
-                var update = _context.Parkings.Find(model.Id);
-                    update.ParkingCode = model.ParkingCode;
-                    update.Name = model.Name;
-                    update.ZipCode = model.ZipCode;
-                    update.Image = model.Image;
-                    update.TotalSlots = model.TotalSlots;
-                    update.Description = model.Description;
-                    update.OpenTime = model.OpenTime;
-                    update.CloseTime = model.CloseTime;
+                var update = _context.Parkings.Find(request.Id);
+                    update.ParkingCode = request.ParkingCode;
+                    update.Name = request.Name;
+                    update.ZipCode = request.ZipCode;
+                    update.Image = request.Image;
+                    update.TotalSlots = request.TotalSlots;
+                    update.Description = request.Description;
+                    update.OpenTime = request.OpenTime;
+                    update.CloseTime = request.CloseTime;
                     update.UpdateBy = "Nguyen Phat";
                     update.UpdateDate = DateTime.Now;   
                 _context.SaveChanges();
-                    return Ok(model);
+                    return Ok(request);
             }
             catch (Exception ex)
             {
@@ -124,7 +127,7 @@ namespace ParkingLot_Api.Controllers
                 var delete = _context.Parkings.Find(id);
                 if (delete == null || delete.IsDeleted == true)
                 {
-                    return NotFound("Không tìm thấy sản phẩm");
+                    return NotFound("Không tìm thấy bãi đậu xe");
                 }
                 else
                 {
@@ -132,7 +135,6 @@ namespace ParkingLot_Api.Controllers
                     delete.DeleteBy = "Nguyen Phat";
                     delete.DeleteDate = DateTime.Now;
                 }
-                //_context.Parkings.Remove(delete);
                 _context.SaveChanges();
                 return Ok("Xóa thành công");
             }
@@ -143,7 +145,32 @@ namespace ParkingLot_Api.Controllers
             }
         }
 
+        [HttpGet("GetForComboBox")]
+        public IActionResult GetForComboBox()
+        {
+            try
+            {
+                var comboBoxData = _context.Parkings
+                    .Where(p => p.IsDeleted == false && p.IsActive == true)
+                    .Select(p => new
+                    {
+                        Id = p.Id,
+                        Name = p.Name // Hoặc thuộc tính bạn muốn hiển thị trong combobox
+                    })
+                    .ToList();
 
+                if (comboBoxData.Count == 0)
+                {
+                    return NotFound("Không có dữ liệu");
+                }
+
+                return Ok(comboBoxData);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
     }
 }

@@ -23,6 +23,7 @@ namespace MODELS.NGHIEPVU
         public decimal? Latitude { get; set; }
 
         public decimal? Longitude { get; set; }
+        public string? Ward{ get; set; }
 
         public string? Address { get; set; }
 
