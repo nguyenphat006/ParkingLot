@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MODELS.DANHMUC;
 using MODELS.NGHIEPVU;
 using Newtonsoft.Json;
@@ -54,6 +55,12 @@ namespace ParkingLot_Fe.Controllers
         [HttpGet]
         public IActionResult ShowInsertPopup()
         {
+            ViewBag.StatusList = new List<SelectListItem>
+            {
+                new SelectListItem { Text = "Hoạt động", Value = "1" },
+                new SelectListItem { Text = "Không hoạt động", Value = "0" }
+            };
+
             var model = new MODELParking(); // Model mới để thêm sản phẩm
             return PartialView("~/Views/Parking/PopupDetail.cshtml", model);
         }
@@ -63,6 +70,11 @@ namespace ParkingLot_Fe.Controllers
         {
             try
             {
+                ViewBag.StatusList = new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "Hoạt động", Value = "1" },
+                    new SelectListItem { Text = "Không hoạt động", Value = "0" }
+                };
                 MODELParking obj = new MODELParking();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetById/" + id).Result;
 

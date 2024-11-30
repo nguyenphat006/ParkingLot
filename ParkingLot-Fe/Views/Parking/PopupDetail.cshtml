@@ -2,17 +2,9 @@
 @{
     ViewData["Title"] = "PopupDetail";
 }
-<head>
-    
-<script src='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.js'></script>
-<link href='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.css' rel='stylesheet' />
-<script src="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.css" rel="stylesheet" />
 
 
-</head>
-
-@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmProduct", @class = "forms-sample" }))
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmParking", @class = "forms-sample" }))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.Id, new { id = "Id" })
@@ -105,7 +97,7 @@
                         <label class="col-form-label">
                             Tỉnh / Thành Phố
                         </label>
-                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.Province, new { @class = "form-control", id = "Province" , @readonly = "readonly"})
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -113,7 +105,7 @@
                         <label class="col-form-label">
                             Quận / Huyện
                         </label>
-                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District", @readonly = "readonly" })
+                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District" , @readonly = "readonly"})
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -126,6 +118,7 @@
                 </div>
             </div>
 
+
             <!-- Row 5: Province và Total Slots -->
             <div class="row">
                 <div class="col-md-6">
@@ -134,6 +127,15 @@
                             Tổng số chỗ
                         </label>
                         @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="Status">Trạng thái</label>
+                        @Html.DropDownListFor(model => model.IsActive, 
+                            new SelectList(ViewBag.StatusList, "Value", "Text", Model.IsActive), 
+                            "Chọn trạng thái", 
+                            new { @class = "form-control", id = "Status" })
                     </div>
                 </div>
             </div>
@@ -180,7 +182,7 @@
 
 
 <!-- Modal Bootstrap -->
-<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true" inert>
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
@@ -228,13 +230,9 @@
 
 
 
+
 <script>
-    
-
-    
-
-
-// Map initialization
+    // CÀI ĐẶT MAP
 goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
 const map = new goongjs.Map({
     container: 'map',
@@ -244,19 +242,33 @@ const map = new goongjs.Map({
 });
 
 
-// Resize map after modal is shown
+// CẬP NHẬT SIZE MAP
 const mapModal = document.getElementById('mapModal');
 mapModal.addEventListener('shown.bs.modal', () => {
     map.resize(); // Cập nhật kích thước bản đồ
 });
 
 
+ document.getElementById("selectLocationButton").addEventListener("click", function () {
+    var mapModal = document.getElementById("mapModal");
+    mapModal.removeAttribute("inert");
+    var bootstrapModal = new bootstrap.Modal(mapModal);
+    bootstrapModal.show();
+});
+</script>
+
+
+
+
+
+
+<script>
 let currentMarker = null; // Biến lưu trữ marker hiện tại
 let selectedLat = null;
 let selectedLng = null;
 let selectedAddress = null;
 
-// Function to fetch address from coordinates using Goong API
+// FETCH API ĐỂ LẤY ĐỊA CHỈ TỪ TỌA ĐỘ
 async function fetchAddressFromCoordinates(lat, lng) {
     const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW'; // Thay bằng API Key của bạn
     const url = `https://rsapi.goong.io/Geocode?latlng=${lat},${lng}&api_key=${apiKey}`;
@@ -293,7 +305,7 @@ async function fetchAddressFromCoordinates(lat, lng) {
 }
 
 
-// Function to handle adding marker and getting address
+// HÀM XỬ LÝ SỰ KIỆN CLICK TRÊN BẢN ĐỒ
 function handleMapClick(event) {
     const { lng, lat } = event.lngLat;
 
@@ -315,7 +327,6 @@ function handleMapClick(event) {
     sidebar.classList.remove('collapsed');
 
 }
-
  function toggleSidebar(id) {
     const elem = document.getElementById(id);
     const collapsed = elem.classList.contains('collapsed');
@@ -378,7 +389,6 @@ document.getElementById("mapModal").addEventListener("shown.bs.modal", () => {
 
 
 
-// Add event listener to the confirm button
 document.getElementById("confirmLocation").addEventListener("click", () => {
     if (selectedLat !== null && selectedLng !== null && selectedAddress !== null) {
         document.getElementById("Latitude").value = selectedLat.toFixed(6);
@@ -388,27 +398,71 @@ document.getElementById("confirmLocation").addEventListener("click", () => {
         // Close the modal
         var mapModal = bootstrap.Modal.getInstance(document.getElementById("mapModal"));
         mapModal.hide();
+        document.getElementById("mapModal").setAttribute("inert", "true");
     } else {
         alert("Vui lòng chọn vị trí trên bản đồ trước khi xác nhận.");
     }
 });
-
-
-
-
-
-
 </script>
 
 
 
+
+
+//FILL ADDRESS DATA TO PROVINCE, DISTRICT, WARD
 <script>
-    // Khi nhấn nút "Chọn vị trí từ bản đồ"
-    document.getElementById("selectLocationButton").addEventListener("click", function () {
-        // Hiển thị modal với ID mapModal
-        var mapModal = new bootstrap.Modal(document.getElementById("mapModal"));
-        mapModal.show();
+const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW'; 
+const addressInput = document.getElementById('Address');
+const provinceInput = document.getElementById('Province');
+const districtInput = document.getElementById('District');
+const wardInput = document.getElementById('Ward');
+let sessionToken = crypto.randomUUID();
+const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${apiKey}&sessiontoken=${sessionToken}`;
+
+// Hàm xử lý khi địa chỉ được lấy từ bản đồ và cần điền vào các ô input
+function fillAddressFromMap(addressInput) {
+
+  // Gọi API AutoComplete để lấy place_id từ địa chỉ
+  const urlDetail = `${url}&input=${encodeURIComponent(addressInput)}`;
+
+  fetch(urlDetail)
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'OK') {
+        const place = data.predictions[0]; // Lấy kết quả đầu tiên từ autocomplete
+
+        // Kiểm tra và điền thông tin vào các ô input từ prediction.compound
+        if (place.compound) {
+          // Điền thông tin vào các ô input tương ứng
+          provinceInput.value = place.compound.province || '';  // Tỉnh / Thành phố
+          districtInput.value = place.compound.district || '';  // Quận / Huyện
+          wardInput.value = place.compound.commune || '';  // Phường / Xã
+        }
+
+        // Cập nhật ô Address
+        addressInput.value = place.description;  // Cập nhật địa chỉ vào ô Address
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching address autocomplete data:', error);
     });
+}
+
+// Thêm sự kiện cho nút "Xác nhận vị trí"
+document.getElementById('confirmLocation').addEventListener('click', function () {
+  // Lấy địa chỉ đã chọn từ bản đồ (ví dụ là từ `addressInput` hoặc dữ liệu khác từ bản đồ)
+  const selectedAddress = addressInput.value;
+
+  // Gọi hàm để điền thông tin vào các ô input
+  fillAddressFromMap(selectedAddress);
+});
+</script>
+
+
+<script>
+
+
+   
 </script>
 
 
