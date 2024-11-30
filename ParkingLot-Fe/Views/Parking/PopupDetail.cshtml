@@ -7,8 +7,8 @@
 <script src='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.js'></script>
 <link href='https://cdn.jsdelivr.net/npm/@@goongmaps/goong-js@1.0.9/dist/goong-js.css' rel='stylesheet' />
 <script src="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.css" rel="stylesheet" />
-<link rel="stylesheet" href="~/Website/style.css" /> 
+<link href="https://cdn.jsdelivr.net/npm/@@goongmaps/goong-geocoder@1.1.1/dist/goong-geocoder.css" rel="stylesheet" />
+
 
 </head>
 
@@ -95,7 +95,7 @@
                         <label class="col-form-label">
                             Địa chỉ
                         </label>
-                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address" })
+                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
                     </div>
                 </div               
             </div>
@@ -105,7 +105,7 @@
                         <label class="col-form-label">
                             Tỉnh / Thành Phố
                         </label>
-                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address" })
+                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -113,7 +113,7 @@
                         <label class="col-form-label">
                             Quận / Huyện
                         </label>
-                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District" })
+                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District", @readonly = "readonly" })
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -121,7 +121,7 @@
                         <label class="col-form-label">
                             Phường / Xã
                         </label>
-                        @Html.TextBoxFor(model => model.Ward, new { @class = "form-control", id = "Ward" })
+                        @Html.TextBoxFor(model => model.Ward, new { @class = "form-control", id = "Ward", @readonly = "readonly" })
                     </div>
                 </div>
             </div>
@@ -189,30 +189,27 @@
             </div>
             <div class="modal-body">
                 <div id="map">
-                    <div id="left" class="sidebar left collapsed sidebar-map">
-                        <h4 class="sidebar-title">Thông tin vị trí</h4>
+                   <div id="left" class="sidebar left collapsed sidebar-map">
+                          <div class="sidebar-header">
+                                <div class="btn-icon" onclick="toggleSidebar('left')">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                </div>
+                                <span class="ms-3" style="color: black;">Thông tin địa điểm</span>
+                           </div>
                         <div class="sidebar-info">
+                             <div class="address">
+                                <p id="full-address" class="address-title"></p>
+                            </div>
                             <div class="coordinates">
                                 <div class="coordinate-item">
                                     <span class="label">Latitude (Vĩ độ):</span>
-                                    <span class="value">10.945273</span>
+                                    <span id="latitude-value" class="value">10.945273</span>
                                 </div>
                                 <div class="coordinate-item">
                                     <span class="label">Longitude (Kinh độ):</span>
-                                    <span class="value">106.824964</span>
+                                    <span id="longitude-value" class="value">106.824964</span>
                                 </div>
-                            </div>
-                            <div class="address">
-                                <p class="address-title">Địa chỉ:</p>
-                                <ul>
-                                    <li><strong>Tỉnh/Thành phố:</strong> <span>Đồng Nai</span></li>
-                                    <li><strong>Quận/Huyện:</strong> <span>Biên Hòa</span></li>
-                                    <li><strong>Phường/Xã:</strong> <span>Trảng Dài</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')">
-                            &rarr;
+                            </div>                           
                         </div>
                     </div>
                 </div>
@@ -254,6 +251,86 @@ mapModal.addEventListener('shown.bs.modal', () => {
 });
 
 
+let currentMarker = null; // Biến lưu trữ marker hiện tại
+let selectedLat = null;
+let selectedLng = null;
+let selectedAddress = null;
+
+// Function to fetch address from coordinates using Goong API
+async function fetchAddressFromCoordinates(lat, lng) {
+    const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW'; // Thay bằng API Key của bạn
+    const url = `https://rsapi.goong.io/Geocode?latlng=${lat},${lng}&api_key=${apiKey}`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data.results && data.results.length > 0) {
+            const addressComponents = data.results[0].address_components;
+
+            // Update the UI using id selectors
+            document.getElementById("latitude-value").textContent = lat.toFixed(6);
+            document.getElementById("longitude-value").textContent = lng.toFixed(6);
+
+            // Full address (number, street, etc.)
+            const fullAddress = data.results[0].formatted_address || "Không xác định";
+            document.getElementById("full-address").textContent = `${fullAddress}`;
+
+            // Lưu trữ tọa độ và địa chỉ vào các biến toàn cục
+            selectedLat = lat;
+            selectedLng = lng;
+            selectedAddress = fullAddress;
+
+            console.log("Fetched Address:", fullAddress);
+        } else {
+            console.error("No address found for these coordinates.");
+            alert("Không thể lấy địa chỉ từ vị trí này.");
+        }
+    } catch (error) {
+        console.error("Error fetching address:", error);
+        alert("Có lỗi xảy ra khi lấy địa chỉ.");
+    }
+}
+
+
+// Function to handle adding marker and getting address
+function handleMapClick(event) {
+    const { lng, lat } = event.lngLat;
+
+    if (currentMarker) {
+        currentMarker.remove();
+    }
+
+    currentMarker = new goongjs.Marker({
+        color: "blue",
+    })
+        .setLngLat([lng, lat]) // Đảm bảo thứ tự [lng, lat]
+        .addTo(map);
+
+    console.log(`Marker added at: Latitude ${lat}, Longitude ${lng}`);
+    fetchAddressFromCoordinates(lat, lng); // Gọi đúng thứ tự lat, lng
+
+    // Hiển thị sidebar
+    const sidebar = document.getElementById('left');
+    sidebar.classList.remove('collapsed');
+
+}
+
+ function toggleSidebar(id) {
+    const elem = document.getElementById(id);
+    const collapsed = elem.classList.contains('collapsed');
+    
+    if (collapsed) {
+        elem.classList.remove('collapsed');
+    } else {
+        elem.classList.add('collapsed');
+    }
+}
+
+
+// Thêm sự kiện click cho map
+map.on("click", handleMapClick);
+
 // Function to get user's current location and move the map
 function getCurrentLocationAndMoveMap() {
     if ("geolocation" in navigator) {
@@ -262,15 +339,26 @@ function getCurrentLocationAndMoveMap() {
                 const userLat = position.coords.latitude;
                 const userLng = position.coords.longitude;
 
-                // Fly the map to the user's location
                 map.flyTo({
                     center: [userLng, userLat],
-                    zoom: 15, // Adjust zoom level for better view
-                    speed: 1.5, // Animation speed
-                    curve: 1, // Animation curve
+                    zoom: 15,
+                    speed: 1.5,
+                    curve: 1,
                 });
 
                 console.log(`User's location: Latitude ${userLat}, Longitude ${userLng}`);
+
+                if (currentMarker) {
+                    currentMarker.remove();
+                }
+
+                currentMarker = new goongjs.Marker({
+                    color: "blue",
+                })
+                    .setLngLat([userLng, userLat]) // Đảm bảo thứ tự [lng, lat]
+                    .addTo(map);
+                    toggleSidebar('left');
+                fetchAddressFromCoordinates(userLat, userLng);
             },
             (error) => {
                 console.error("Error getting location: ", error);
@@ -283,81 +371,30 @@ function getCurrentLocationAndMoveMap() {
 }
 
 // Add event listener to automatically get the user's location when modal is shown
-document.getElementById('mapModal').addEventListener('shown.bs.modal', () => {
+document.getElementById("mapModal").addEventListener("shown.bs.modal", () => {
     getCurrentLocationAndMoveMap();
 });
 
 
 
-// Add map controls
-map.addControl(new goongjs.NavigationControl(), 'top-right');
-map.addControl(new goongjs.FullscreenControl(), 'top-right');
 
-// Initialize geocoder
-const geocoder = new GoongGeocoder({
-    accessToken: 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW',
-    goongjs: goongjs
-});
-document.getElementById('geocoder').appendChild(geocoder.onAdd(map));
+// Add event listener to the confirm button
+document.getElementById("confirmLocation").addEventListener("click", () => {
+    if (selectedLat !== null && selectedLng !== null && selectedAddress !== null) {
+        document.getElementById("Latitude").value = selectedLat.toFixed(6);
+        document.getElementById("Longitude").value = selectedLng.toFixed(6);
+        document.getElementById("Address").value = selectedAddress;
 
-
-
-// Sidebar toggle function
-function toggleSidebar(id) {
-    const elem = document.getElementById(id);
-    const toggleIcon = elem.querySelector('.bi');
-    const collapsed = elem.classList.contains('collapsed');
-
-    if (collapsed) {
-        elem.classList.remove('collapsed');
-        toggleIcon.classList.remove('bi-arrow-left');
-        toggleIcon.classList.add('bi-arrow-right');
+        // Close the modal
+        var mapModal = bootstrap.Modal.getInstance(document.getElementById("mapModal"));
+        mapModal.hide();
     } else {
-        elem.classList.add('collapsed');
-        toggleIcon.classList.remove('bi-arrow-right');
-        toggleIcon.classList.add('bi-arrow-left');
+        alert("Vui lòng chọn vị trí trên bản đồ trước khi xác nhận.");
     }
-}
-
-// Thêm biến để lưu marker hiện tại ở đầu file script
-let currentMarker = null;
-
-// Sửa lại sự kiện click vào map
-map.on('click', function (e) {
-    // Lấy tọa độ điểm được click
-    const coordinates = e.lngLat;
-
-    // Xóa marker cũ nếu có
-    if (currentMarker) {
-        currentMarker.remove();
-    }
-
-    // Tạo marker mới và lưu lại
-    currentMarker = new goongjs.Marker()
-        .setLngLat(coordinates)
-        .addTo(map);
-
-    // Gọi API reverse geocoding để lấy thông tin địa điểm
-    fetch(`https://rsapi.goong.io/Geocode?latlng=${coordinates.lat},${coordinates.lng}&api_key=KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.results && data.results[0]) {
-                const place = data.results[0];
-
-                // Cập nhật thông tin trong sidebar
-                // Viết mã để lấy ảnh từ goong ở bên trên thêm vào .place-details img
-                document.querySelector('.place-title').textContent = place.formatted_address;
-                document.querySelector('.place-info span').textContent = place.formatted_address;
-
-                // Hiển thị sidebar
-                const sidebar = document.getElementById('left');
-                sidebar.classList.remove('collapsed');
-                const toggleIcon = sidebar.querySelector('.bi');
-                toggleIcon.classList.remove('bi-arrow-left');
-                toggleIcon.classList.add('bi-arrow-right');
-            }
-        });
 });
+
+
+
 
 
 
