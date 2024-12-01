@@ -35,6 +35,11 @@ namespace ParkingLot_Fe.Controllers
         {
             try
             {
+                ViewBag.StatusList = new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "Hoạt động", Value = "true" },
+                    new SelectListItem { Text = "Không hoạt động", Value = "false" }
+                };
                 MODELParking obj = new MODELParking();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetById/" + id).Result;
 
@@ -57,8 +62,8 @@ namespace ParkingLot_Fe.Controllers
         {
             ViewBag.StatusList = new List<SelectListItem>
             {
-                new SelectListItem { Text = "Hoạt động", Value = "1" },
-                new SelectListItem { Text = "Không hoạt động", Value = "0" }
+                new SelectListItem { Text = "Hoạt động", Value = "true" },
+                new SelectListItem { Text = "Không hoạt động", Value = "false" }
             };
 
             var model = new MODELParking(); // Model mới để thêm sản phẩm
@@ -72,8 +77,8 @@ namespace ParkingLot_Fe.Controllers
             {
                 ViewBag.StatusList = new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "Hoạt động", Value = "1" },
-                    new SelectListItem { Text = "Không hoạt động", Value = "0" }
+                    new SelectListItem { Text = "Hoạt động", Value = "true" },
+                    new SelectListItem { Text = "Không hoạt động", Value = "false" }
                 };
                 MODELParking obj = new MODELParking();
                 HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "/parking/GetById/" + id).Result;

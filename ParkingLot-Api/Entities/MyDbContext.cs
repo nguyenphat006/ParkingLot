@@ -113,6 +113,7 @@ public partial class MyDbContext : DbContext
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.CloseTime).HasColumnType("datetime");
             entity.Property(e => e.CreateBy).HasMaxLength(256);
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.DeleteBy).HasMaxLength(256);
@@ -120,9 +121,10 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.District).HasMaxLength(120);
             entity.Property(e => e.Image).IsUnicode(false);
-            entity.Property(e => e.Latitude).HasColumnType("decimal(18, 8)");
+            entity.Property(e => e.Latitude).HasColumnType("decimal(10, 8)");
             entity.Property(e => e.Longitude).HasColumnType("decimal(11, 8)");
             entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.OpenTime).HasColumnType("datetime");
             entity.Property(e => e.ParkingCode)
                 .HasMaxLength(256)
                 .IsUnicode(false);

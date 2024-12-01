@@ -35,9 +35,13 @@ namespace MODELS.NGHIEPVU
 
         public string? Description { get; set; }
 
-        public TimeOnly? OpenTime { get; set; }
+        public DateTime? OpenTime { get; set; }
 
-        public TimeOnly? CloseTime { get; set; }        
+        public DateTime? CloseTime { get; set; }
+
+        public string? OpenTimeFormatted => OpenTime?.ToString("hh:mm tt");
+        public string? CloseTimeFormatted => CloseTime?.ToString("hh:mm tt");
+
     }
 
     public class MODELParkingValidator : AbstractValidator<MODELParking>

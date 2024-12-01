@@ -46,7 +46,7 @@ namespace ParkingLot_Api.Controllers
             try
             {
                 var obj = _context.Parkings.Find(id);
-                if (obj == null || obj.IsDeleted == true || obj.IsActive == true)
+                if (obj == null || obj.IsDeleted == true || obj.IsActive == false)
                 {
                     return NotFound($"Không tìm thấy bãi đậu xe có mã {obj.ParkingCode}");
                 }
@@ -70,8 +70,6 @@ namespace ParkingLot_Api.Controllers
                 model.CreateDate = DateTime.Now;
                 model.UpdateBy = "Nguyen Phat";
                 model.UpdateDate = DateTime.Now;
-                model.OpenTime = TimeOnly.MinValue;
-                model.CloseTime = TimeOnly.MaxValue;
                 model.IsDeleted = false;
                 model.IsActive = true;
                 _context.Parkings.Add(model);

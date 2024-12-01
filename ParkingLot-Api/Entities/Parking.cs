@@ -31,9 +31,9 @@ public partial class Parking
 
     public string? Description { get; set; }
 
-    public TimeOnly? OpenTime { get; set; }
+    public DateTime? OpenTime { get; set; }
 
-    public TimeOnly? CloseTime { get; set; }
+    public DateTime? CloseTime { get; set; }
 
     public DateTime? CreateDate { get; set; }
 

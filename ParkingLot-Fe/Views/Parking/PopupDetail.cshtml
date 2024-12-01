@@ -89,7 +89,7 @@
                         </label>
                         @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
                     </div>
-                </div               
+                </div>               
             </div>
             <div class="row">
                 <div class="col-md-4">
@@ -118,41 +118,7 @@
                 </div>
             </div>
 
-
-            <!-- Row 5: Province và Total Slots -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="col-form-label">
-                            Tổng số chỗ
-                        </label>
-                        @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number" })
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="Status">Trạng thái</label>
-                        @Html.DropDownListFor(model => model.IsActive, 
-                            new SelectList(ViewBag.StatusList, "Value", "Text", Model.IsActive), 
-                            "Chọn trạng thái", 
-                            new { @class = "form-control", id = "Status" })
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 6: Description -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="mb-3">
-                        <label class="col-form-label">
-                            Mô tả
-                        </label>
-                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description", rows = 3 })
-                    </div>
-                </div>
-            </div>
-
-            <!-- Row 7: Open Time và Close Time -->
+             <!-- Row 7: Open Time và Close Time -->
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
@@ -171,6 +137,40 @@
                     </div>
                 </div>
             </div>
+            <!-- Row 5: Province và Total Slots -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tổng số chỗ
+                        </label>
+                        @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label" for="Status">Trạng thái</label>
+                        @Html.DropDownListFor(model => model.IsActive, 
+                            new SelectList(ViewBag.StatusList, "Value", "Text", Model.IsActive), 
+                            "Chọn trạng thái", 
+                            new { @class = "form-control", id = "IsActive" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6: Description -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mô tả
+                        </label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description", rows = 3 })
+                    </div>
+                </div>
+            </div>
+
+           
         </div>
     </div>
 
@@ -226,6 +226,97 @@
 </div>
 
 
+
+
+
+
+
+
+
+
+<script>
+    $(document).on('click', '#btnLuu', function (event) {
+        event.preventDefault(); // Ngăn hành vi mặc định của nút
+
+        // Lấy dữ liệu từ form
+        let formData = {
+            ParkingCode: $('#ParkingCode').val().trim(),
+            Name: $('#Name').val().trim(),
+            Latitude: parseFloat($('#Latitude').val()),
+            Longitude: parseFloat($('#Longitude').val()),
+            ZipCode: parseInt($('#ZipCode').val()), // Chuyển sang số nguyên
+            Address: $('#Address').val().trim(),
+            Province: $('#Province').val().trim(),
+            District: $('#District').val().trim(),
+            Ward: $('#Ward').val().trim(),
+            OpenTime: new Date(`1970-01-01T${$('#OpenTime').val()}:00`), // Định dạng ISO 8601
+            CloseTime: new Date(`1970-01-01T${$('#CloseTime').val()}:00`),
+            TotalSlots: parseInt($('#TotalSlots').val()),
+            IsActive: $('#IsActive').val() === "true", // Chuyển sang boolean
+            Description: $('#Description').val().trim()
+        };
+
+        console.log(JSON.stringify(formData));
+
+        // Kiểm tra dữ liệu hợp lệ
+        if (!formData.ParkingCode) {
+            alert("Mã bãi đậu xe không được để trống!");
+            return;
+        }
+        if (!formData.Name) {
+            alert("Tên bãi đậu xe không được để trống!");
+            return;
+        }
+        if (isNaN(formData.Latitude) || isNaN(formData.Longitude)) {
+            alert("Vui lòng chọn vị trí hợp lệ từ bản đồ!");
+            return;
+        }
+        if (!formData.ZipCode) {
+            alert("Mã zip không được để trống!");
+            return;
+        }
+        if (!formData.TotalSlots || formData.TotalSlots <= 0) {
+            alert("Tổng số chỗ phải lớn hơn 0!");
+            return;
+        }
+        if (!formData.OpenTime || !formData.CloseTime) {
+            alert("Vui lòng điền đầy đủ giờ mở cửa và giờ đóng cửa!");
+            return;
+        }
+
+        // Gửi dữ liệu qua AJAX
+        $.ajax({
+            url: '/Parking/Post', // Endpoint gọi đến Controller
+            type: "POST",
+            contentType: "application/json", // Dữ liệu dạng JSON
+            data: JSON.stringify(formData), // Chuyển đổi đối tượng formData thành JSON
+            success: function (response) {
+                // Xử lý phản hồi từ server
+                if (response.success) {
+                    alert(response.data ? "Cập nhật thành công!" : "Thêm mới thành công!");
+                    closePopUp();
+                    location.reload(); // Làm mới danh sách
+                } else {
+                    alert(response.message || "Có lỗi xảy ra!");
+                }
+            },
+            error: function () {
+                alert("Không thể kết nối đến server. Vui lòng thử lại sau!");
+            }
+        });
+    });
+
+
+
+
+
+
+    function closePopUp() {
+        $('#modal-default').modal('hide');
+    }
+
+   
+</script>
 
 
 
@@ -409,7 +500,7 @@ document.getElementById("confirmLocation").addEventListener("click", () => {
 
 
 
-//FILL ADDRESS DATA TO PROVINCE, DISTRICT, WARD
+@* // FILL ADDRESS DATA TO PROVINCE, DISTRICT, WARD *@
 <script>
 const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW'; 
 const addressInput = document.getElementById('Address');
@@ -459,11 +550,6 @@ document.getElementById('confirmLocation').addEventListener('click', function ()
 </script>
 
 
-<script>
-
-
-   
-</script>
 
 
 

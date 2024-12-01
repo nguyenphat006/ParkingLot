@@ -24,6 +24,13 @@ builder.Services.AddDbContext<AppDbContext>(option =>
 }
 );
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
+
 
 
 builder.Services.AddAuthorization();

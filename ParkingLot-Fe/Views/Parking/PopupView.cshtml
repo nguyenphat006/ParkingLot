@@ -1,5 +1,176 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model MODELS.NGHIEPVU.MODELParking
 @{
+    ViewData["Title"] = "PopupView";
 }
+
+
+    <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Thông tin bãi đậu xe</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopUp()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <!-- Row 1: Parking Code và Name -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mã bãi đậu xe
+                        </label>
+                    @Html.TextBoxFor(model => model.ParkingCode, new { @class = "form-control", id = "ParkingCode", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tên bãi đậu xe
+                        </label>
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control", id = "Name", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Latitude và Longitude -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Vĩ độ
+                        </label>
+                        @Html.TextBoxFor(model => model.Latitude, new { @class = "form-control", id = "Latitude", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Kinh độ
+                        </label>
+                        @Html.TextBoxFor(model => model.Longitude, new { @class = "form-control", id = "Longitude", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Row 3: Zip Code và Image -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mã zip
+                        </label>
+                    @Html.TextBoxFor(model => model.ZipCode, new { @class = "form-control", id = "ZipCode", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Hình ảnh
+                        </label>
+                        <input class="form-control" type="file" id="formFile">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Address và District -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Địa chỉ
+                        </label>
+                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tỉnh / Thành Phố
+                        </label>
+                        @Html.TextBoxFor(model => model.Province, new { @class = "form-control", id = "Province", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Quận / Huyện
+                        </label>
+                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Phường / Xã
+                        </label>
+                        @Html.TextBoxFor(model => model.Ward, new { @class = "form-control", id = "Ward", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 7: Open Time và Close Time -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Giờ mở cửa
+                        </label>
+                    @Html.TextBoxFor(model => model.OpenTimeFormatted, new { @class = "form-control", id = "OpenTime", @readonly = "readonly" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Giờ đóng cửa
+                        </label>
+                    @Html.TextBoxFor(model => model.CloseTimeFormatted, new { @class = "form-control", id = "CloseTime", @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+            <!-- Row 5: Province và Total Slots -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tổng số chỗ
+                        </label>
+                    @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number", @readonly = "readonly" })
+                    </div>
+                </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="col-form-label" for="Status">Trạng thái</label>
+                    @Html.DropDownListFor(model => model.IsActive, (List<SelectListItem>)ViewBag.StatusList, new { @class = "form-control", id = "IsActive", disabled = "disabled" })
+                </div>
+            </div>
+            </div>
+
+            <!-- Row 6: Description -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mô tả
+                        </label>
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description", rows = 3, @readonly = "readonly" })
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="closePopUp()">Đóng</button>
+    </div>
+
+
+
+<script>
+
+    function closePopUp() {
+        $('#modal-default').modal('hide');
+    }
+</script>

@@ -43,8 +43,8 @@
                             <td>@Html.DisplayFor(modelItem => item.Name)</td>
                             <td>@Html.DisplayFor(modelItem => item.TotalSlots)</td>
                             <td>@Html.DisplayFor(modelItem => item.Address)</td>
-                            <td>@Html.DisplayFor(modelItem => item.OpenTime)</td>
-                            <td>@Html.DisplayFor(modelItem => item.CloseTime)</td>
+                            <td>@Html.DisplayFor(modelItem => item.OpenTimeFormatted)</td>
+                            <td>@Html.DisplayFor(modelItem => item.CloseTimeFormatted)</td>
                             <td class="project-actions text-center">
                                 <a class="btn" onclick="xemThongTin('@item.Id')" title="Xem thông tin">
                                     <i class="fas fa-folder"></i>
