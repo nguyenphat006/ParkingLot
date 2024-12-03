@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MODELS.DANHMUC;
 using MODELS.NGHIEPVU;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace ParkingLot_Fe.Controllers
@@ -173,5 +174,51 @@ namespace ParkingLot_Fe.Controllers
                 return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
             }
         }
+
+        [HttpPost]
+        public IActionResult UploadImage(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return Json(new { success = false, message = "File không hợp lệ." });
+                }
+
+                // Tạo MultipartFormDataContent để gửi dữ liệu
+                var content = new MultipartFormDataContent();
+
+                // Đọc toàn bộ nội dung file vào một mảng byte
+                using (var memoryStream = new MemoryStream())
+                {
+                    file.CopyTo(memoryStream); // Copy nội dung file vào memoryStream
+                    var fileContent = new ByteArrayContent(memoryStream.ToArray());
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                    content.Add(fileContent, "file", file.FileName);
+                }
+
+                // Gửi request tới API UploadImage
+                HttpResponseMessage response = _client.PostAsync(_client.BaseAddress + "/parking/UploadImage", content).Result;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Lấy tên file trả về từ API
+                    var result = response.Content.ReadAsStringAsync().Result;
+                    return Json(new { success = true, data = result, message = "Upload ảnh thành công!" });
+                }
+
+                // Nếu phản hồi không thành công
+                string errorDetails = response.Content.ReadAsStringAsync().Result ?? "Không rõ lý do.";
+                return Json(new { success = false, message = $"Upload ảnh thất bại: {errorDetails}" });
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi và trả về phản hồi phù hợp
+                return Json(new { success = false, message = $"Đã xảy ra lỗi: {ex.Message}" });
+            }
+        }
+
     }
+
 }
+

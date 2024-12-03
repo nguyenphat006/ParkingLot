@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ParkingLot_Api.Endentity;
 using ParkingLot_Api.Entities;
-
+using FluentValidation.AspNetCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
+builder.Services.AddControllers()
+    .AddFluentValidation(fv =>
+    {
+        fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    });
 
 
 

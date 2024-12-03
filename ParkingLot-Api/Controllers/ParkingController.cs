@@ -61,7 +61,16 @@ namespace ParkingLot_Api.Controllers
         public IActionResult Post(Parking model)
         {
             try
-            {                
+            {
+                // Validate model bằng FluentValidation
+                var validator = new MODELParkingValidator();
+                var validationResult = validator.Validate(model);
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);  // Trả về lỗi nếu validation không hợp lệ
+                }
+
+                // Thực hiện các bước tạo mới khi validate thành công
                 if (model.Id == Guid.Empty)
                 {
                     model.Id = Guid.NewGuid();
@@ -72,8 +81,10 @@ namespace ParkingLot_Api.Controllers
                 model.UpdateDate = DateTime.Now;
                 model.IsDeleted = false;
                 model.IsActive = true;
+
                 _context.Parkings.Add(model);
                 _context.SaveChanges();
+
                 return Ok("Bãi đậu xe đã được tạo");
             }
             catch (Exception ex)
@@ -81,6 +92,7 @@ namespace ParkingLot_Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
 
         [HttpPut("{id}")]
         public IActionResult Put(MODELParking request)
@@ -169,6 +181,55 @@ namespace ParkingLot_Api.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpPost]
+        public IActionResult UploadImage(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file was uploaded.");
+                }
+
+                // Định nghĩa thư mục lưu ảnh
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+
+                // Kiểm tra và tạo thư mục nếu chưa tồn tại
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Tạo tên file duy nhất
+                var uniqueFileName = $"{file.FileName}";
+
+                // Đường dẫn lưu file
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Kiểm tra xem file đã tồn tại chưa
+                if (System.IO.File.Exists(filePath))
+                {
+                    return Ok(new { FileName = uniqueFileName, Message = "File already exists, not re-uploaded." });
+                }
+
+                // Lưu file vào thư mục nếu chưa tồn tại
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                // Trả về tên file đã lưu
+                return Ok(new { FileName = uniqueFileName });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
 
     }
 }

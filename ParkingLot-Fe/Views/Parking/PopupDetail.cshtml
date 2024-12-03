@@ -22,6 +22,7 @@
                             Mã bãi đậu xe
                         </label>
                         @Html.TextBoxFor(model => model.ParkingCode, new { @class = "form-control", id = "ParkingCode" })
+                        @Html.ValidationMessageFor(model => model.ParkingCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -30,6 +31,7 @@
                             Tên bãi đậu xe
                         </label>
                         @Html.TextBoxFor(model => model.Name, new { @class = "form-control", id = "Name" })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -42,6 +44,7 @@
                             Vĩ độ
                         </label>
                         @Html.TextBoxFor(model => model.Latitude, new { @class = "form-control", id = "Latitude", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Latitude, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -50,6 +53,7 @@
                             Kinh độ
                         </label>
                         @Html.TextBoxFor(model => model.Longitude, new { @class = "form-control", id = "Longitude", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Longitude, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -68,6 +72,7 @@
                             Mã zip
                         </label>
                         @Html.TextBoxFor(model => model.ZipCode, new { @class = "form-control", id = "ZipCode" })
+                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -76,6 +81,7 @@
                             Hình ảnh
                         </label>
                         <input class="form-control" type="file" id="formFile">
+                        @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -88,6 +94,7 @@
                             Địa chỉ
                         </label>
                         @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                     </div>
                 </div>               
             </div>
@@ -98,6 +105,7 @@
                             Tỉnh / Thành Phố
                         </label>
                         @Html.TextBoxFor(model => model.Province, new { @class = "form-control", id = "Province" , @readonly = "readonly"})
+                        @Html.ValidationMessageFor(model => model.Province, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -106,6 +114,7 @@
                             Quận / Huyện
                         </label>
                         @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District" , @readonly = "readonly"})
+                        @Html.ValidationMessageFor(model => model.District, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -114,6 +123,7 @@
                             Phường / Xã
                         </label>
                         @Html.TextBoxFor(model => model.Ward, new { @class = "form-control", id = "Ward", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Ward, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -126,6 +136,7 @@
                             Giờ mở cửa
                         </label>
                         @Html.TextBoxFor(model => model.OpenTime, new { @class = "form-control", id = "OpenTime", type = "time" })
+                        @Html.ValidationMessageFor(model => model.OpenTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -134,6 +145,7 @@
                             Giờ đóng cửa
                         </label>
                         @Html.TextBoxFor(model => model.CloseTime, new { @class = "form-control", id = "CloseTime", type = "time" })
+                        @Html.ValidationMessageFor(model => model.CloseTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -145,6 +157,7 @@
                             Tổng số chỗ
                         </label>
                         @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number" })
+                        @Html.ValidationMessageFor(model => model.TotalSlots, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -235,76 +248,81 @@
 
 
 <script>
-    $(document).on('click', '#btnLuu', function (event) {
+    $(document).on('click', '#btnLuu', async function (event) {
         event.preventDefault(); // Ngăn hành vi mặc định của nút
 
-        // Lấy dữ liệu từ form
-        let formData = {
-            ParkingCode: $('#ParkingCode').val().trim(),
-            Name: $('#Name').val().trim(),
-            Latitude: parseFloat($('#Latitude').val()),
-            Longitude: parseFloat($('#Longitude').val()),
-            ZipCode: parseInt($('#ZipCode').val()), // Chuyển sang số nguyên
-            Address: $('#Address').val().trim(),
-            Province: $('#Province').val().trim(),
-            District: $('#District').val().trim(),
-            Ward: $('#Ward').val().trim(),
-            OpenTime: new Date(`1970-01-01T${$('#OpenTime').val()}:00`), // Định dạng ISO 8601
-            CloseTime: new Date(`1970-01-01T${$('#CloseTime').val()}:00`),
-            TotalSlots: parseInt($('#TotalSlots').val()),
-            IsActive: $('#IsActive').val() === "true", // Chuyển sang boolean
-            Description: $('#Description').val().trim()
-        };
+        // Lấy file ảnh từ input
+        const fileInput = $('#formFile')[0].files[0];
 
-        console.log(JSON.stringify(formData));
 
-        // Kiểm tra dữ liệu hợp lệ
-        if (!formData.ParkingCode) {
-            alert("Mã bãi đậu xe không được để trống!");
-            return;
-        }
-        if (!formData.Name) {
-            alert("Tên bãi đậu xe không được để trống!");
-            return;
-        }
-        if (isNaN(formData.Latitude) || isNaN(formData.Longitude)) {
-            alert("Vui lòng chọn vị trí hợp lệ từ bản đồ!");
-            return;
-        }
-        if (!formData.ZipCode) {
-            alert("Mã zip không được để trống!");
-            return;
-        }
-        if (!formData.TotalSlots || formData.TotalSlots <= 0) {
-            alert("Tổng số chỗ phải lớn hơn 0!");
-            return;
-        }
-        if (!formData.OpenTime || !formData.CloseTime) {
-            alert("Vui lòng điền đầy đủ giờ mở cửa và giờ đóng cửa!");
-            return;
-        }
+        try {
+            // Upload file ảnh qua API UploadImage
+            const formDataImage = new FormData();
+            formDataImage.append("file", fileInput);
 
-        // Gửi dữ liệu qua AJAX
-        $.ajax({
-            url: '/Parking/Post', // Endpoint gọi đến Controller
-            type: "POST",
-            contentType: "application/json", // Dữ liệu dạng JSON
-            data: JSON.stringify(formData), // Chuyển đổi đối tượng formData thành JSON
-            success: function (response) {
-                // Xử lý phản hồi từ server
-                if (response.success) {
-                    alert(response.data ? "Cập nhật thành công!" : "Thêm mới thành công!");
-                    closePopUp();
-                    location.reload(); // Làm mới danh sách
-                } else {
-                    alert(response.message || "Có lỗi xảy ra!");
-                }
-            },
-            error: function () {
-                alert("Không thể kết nối đến server. Vui lòng thử lại sau!");
+            const uploadResponse = await fetch('/Parking/UploadImage', {
+                method: "POST",
+                body: formDataImage,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (!uploadResult.success) {
+                alert(uploadResult.message || "Upload hình ảnh thất bại!");
+                return;
             }
-        });
+
+            const uploadedFileName = JSON.parse(uploadResult.data).fileName; // Chuyển chuỗi JSON thành đối tượng và lấy tên file
+            console.log("File uploaded:", uploadedFileName);
+
+            // Lấy dữ liệu từ form
+            let formData = {
+                ParkingCode: $('#ParkingCode').val().trim(),
+                Name: $('#Name').val().trim(),
+                Latitude: parseFloat($('#Latitude').val()),
+                Longitude: parseFloat($('#Longitude').val()),
+                ZipCode: parseInt($('#ZipCode').val()), // Chuyển sang số nguyên
+                Address: $('#Address').val().trim(),
+                Province: $('#Province').val().trim(),
+                District: $('#District').val().trim(),
+                Ward: $('#Ward').val().trim(),
+                OpenTime: new Date(`1970-01-01T${$('#OpenTime').val()}:00`), // Định dạng ISO 8601
+                CloseTime: new Date(`1970-01-01T${$('#CloseTime').val()}:00`),
+                TotalSlots: parseInt($('#TotalSlots').val()),
+                IsActive: $('#IsActive').val() === "true", // Chuyển sang boolean
+                Description: $('#Description').val().trim(),
+                Image: uploadedFileName // Thêm tên file ảnh vào formData
+            };
+
+            console.log(JSON.stringify(formData));
+
+           
+
+            // Gửi dữ liệu qua AJAX
+            $.ajax({
+                url: '/Parking/Post', // Endpoint gọi đến Controller
+                type: "POST",
+                contentType: "application/json", // Dữ liệu dạng JSON
+                data: JSON.stringify(formData), // Chuyển đổi đối tượng formData thành JSON
+                success: function (response) {
+                    // Xử lý phản hồi từ server
+                    if (response.success) {
+                        alert(response.data ? "Cập nhật thành công!" : "Thêm mới thành công!");
+                        closePopUp();
+                        location.reload(); // Làm mới danh sách
+                    } else {
+                        alert(response.message || "Có lỗi xảy ra!");
+                    }
+                },
+                error: function () {
+                    alert("Không thể kết nối đến server. Vui lòng thử lại sau!");
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi upload file:", error);
+            alert("Đã xảy ra lỗi khi upload hình ảnh!");
+        }
     });
+
 
 
 
