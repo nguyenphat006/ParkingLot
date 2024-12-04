@@ -1,8 +1,8 @@
-﻿@using MODELS.TAIKHOAN;
-@model MODELDangKy;
+﻿@using MODELS.TAIKHOAN
+@model MODELDangKy
 
 @{
-    ViewData["Title"] = "Regiser";
+    ViewData["Title"] = "Register";
     Layout = "~/Views/Shared/_LayoutAccount.cshtml";
 }
 
@@ -20,42 +20,67 @@
         <div class="form-content">
             <div class="signup-form">
                 <div class="title">Đăng ký</div>
-                <form asp-action="Register" method="Post"> 
+
+                <!-- Hiển thị thông báo lỗi -->
+                @if (ViewData.ModelState != null && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+                {
+                    <div class="alert alert-danger">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <p>@error.ErrorMessage</p>
+                        }
+                    </div>
+                }
+
+                <!-- Hiển thị thông báo thành công -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                <form method="post">
                     <div class="input-boxes">
                         <div class="input-box">
                             <i class="fas fa-user"></i>
-                            <input asp-for="HoTen" type="text" placeholder="Nhập họ và tên" required>
+                            <input id="HoTen" name="UserName" type="text" placeholder="Nhập họ và tên" value="@Model?.UserName" required>
                         </div>
-                        <span asp-validation-for="HoTen" class="text-danger"></span>
                         <div class="input-box">
                             <i class="fas fa-envelope"></i>
-                            <input asp-for="Email" type="text" placeholder="Nhập Email của bạn" required>
+                            <input id="Email" name="Email" type="email" placeholder="Nhập Email của bạn" value="@Model?.Email" required>
                         </div>
-                        <span asp-validation-for="Email" class="text-danger"></span>
                         <div class="input-box">
                             <i class="fas fa-lock"></i>
-                            <input asp-for="MatKhau" type="password" placeholder="Nhập mật khẩu" required>
+                            <input id="MatKhau" name="PasswordHash" type="password" placeholder="Nhập mật khẩu" required>
+                            <button type="button" onclick="togglePassword('MatKhau')" class="eye-button">👁️</button>
                         </div>
-                        <span asp-validation-for="MatKhau" class="text-danger"></span>
                         <div class="input-box">
                             <i class="fas fa-lock"></i>
-                            <input asp-for="XacNhanMatKhau" type="password" placeholder="Xác nhận mật khẩu" required>
+                            <input id="XacNhanMatKhau" name="XacNhanMatKhau" type="password" placeholder="Xác nhận mật khẩu" required>
+                            <button type="button" onclick="togglePassword('XacNhanMatKhau')" class="eye-button">👁️</button>
                         </div>
-                        <span asp-validation-for="XacNhanMatKhau" class="text-danger"></span>
                         <div class="button input-box">
-                            <input value="Register" type="submit" value="Đăng Ký">
+                            <button type="submit">Đăng Ký</button>
                         </div>
-                        <div class="text sign-up-text">Đã có tài khoản? <a asp-controller="Account" asp-action="Login">Đăng nhập</a> </div>
+                        <div class="text sign-up-text">Đã có tài khoản? <a href="/Account/Login">Đăng nhập</a></div>
                     </div>
                 </form>
             </div>
         </div>
-        
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <script>
+        // Hàm bật/tắt xem mật khẩu
+        function togglePassword(id) {
+            const passwordField = document.getElementById(id);
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+    </script>
 }
