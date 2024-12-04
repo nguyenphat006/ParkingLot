@@ -5,6 +5,8 @@ using MODELS;
 using MODELS.DANHMUC;
 using MODELS.NGHIEPVU;
 using ParkingLot_Api.Entities;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace ParkingLot_Api.Controllers
 {
@@ -13,9 +15,14 @@ namespace ParkingLot_Api.Controllers
     public class ParkingController : ControllerBase
     {
         private readonly MyDbContext _context;
+        private readonly Cloudinary _cloudinary;
+
         public ParkingController(MyDbContext context)
         {
             _context = context;
+            string cloudinaryUrl = Environment.GetEnvironmentVariable("CLOUDINARY_URL");
+            _cloudinary = new Cloudinary(cloudinaryUrl);
+            _cloudinary.Api.Secure = true;  // Đảm bảo sử dụng kết nối bảo mật
         }
         [HttpGet]
         public IActionResult GetAll()
@@ -61,15 +68,7 @@ namespace ParkingLot_Api.Controllers
         public IActionResult Post(Parking model)
         {
             try
-            {
-                // Validate model bằng FluentValidation
-                var validator = new MODELParkingValidator();
-                var validationResult = validator.Validate(model);
-                if (!validationResult.IsValid)
-                {
-                    return BadRequest(validationResult.Errors);  // Trả về lỗi nếu validation không hợp lệ
-                }
-
+            {               
                 // Thực hiện các bước tạo mới khi validate thành công
                 if (model.Id == Guid.Empty)
                 {
@@ -183,8 +182,56 @@ namespace ParkingLot_Api.Controllers
         }
 
 
+        //[HttpPost]
+        //public IActionResult UploadImage(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        if (file == null || file.Length == 0)
+        //        {
+        //            return BadRequest("No file was uploaded.");
+        //        }
+
+        //        // Định nghĩa thư mục lưu ảnh
+        //        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+
+        //        // Kiểm tra và tạo thư mục nếu chưa tồn tại
+        //        if (!Directory.Exists(uploadsFolder))
+        //        {
+        //            Directory.CreateDirectory(uploadsFolder);
+        //        }
+
+        //        // Tạo tên file duy nhất
+        //        var uniqueFileName = $"{file.FileName}";
+
+        //        // Đường dẫn lưu file
+        //        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //        // Kiểm tra xem file đã tồn tại chưa
+        //        if (System.IO.File.Exists(filePath))
+        //        {
+        //            return Ok(new { FileName = uniqueFileName, Message = "File already exists, not re-uploaded." });
+        //        }
+
+        //        // Lưu file vào thư mục nếu chưa tồn tại
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            file.CopyTo(stream);
+        //        }
+
+        //        // Trả về tên file đã lưu
+        //        return Ok(new { FileName = uniqueFileName });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
+
+
+
         [HttpPost]
-        public IActionResult UploadImage(IFormFile file)
+        public async Task<IActionResult> UploadImage(IFormFile file)
         {
             try
             {
@@ -193,42 +240,35 @@ namespace ParkingLot_Api.Controllers
                     return BadRequest("No file was uploaded.");
                 }
 
-                // Định nghĩa thư mục lưu ảnh
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-
-                // Kiểm tra và tạo thư mục nếu chưa tồn tại
-                if (!Directory.Exists(uploadsFolder))
+                // Tạo đối tượng UploadParams từ Cloudinary để upload hình ảnh
+                var uploadParams = new ImageUploadParams()
                 {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
+                    File = new FileDescription(file.FileName, file.OpenReadStream()),
+                    // Tùy chọn thư mục lưu trữ trên Cloudinary
+                    Folder = "parkinglot_images/",
+                    PublicId = Guid.NewGuid().ToString(),  // Tạo publicId duy nhất cho mỗi hình ảnh
+                    Overwrite = true  // Chấp nhận ghi đè ảnh nếu tên trùng
+                };
 
-                // Tạo tên file duy nhất
-                var uniqueFileName = $"{file.FileName}";
+                // Thực hiện upload ảnh lên Cloudinary
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
-                // Đường dẫn lưu file
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                // Kiểm tra xem file đã tồn tại chưa
-                if (System.IO.File.Exists(filePath))
+                // Kiểm tra kết quả upload
+                if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return Ok(new { FileName = uniqueFileName, Message = "File already exists, not re-uploaded." });
+                    // Trả về URL của ảnh sau khi upload lên Cloudinary
+                    return Ok(new { FileName = uploadResult.PublicId, Url = uploadResult.SecureUrl.ToString() });
                 }
-
-                // Lưu file vào thư mục nếu chưa tồn tại
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                else
                 {
-                    file.CopyTo(stream);
+                    return StatusCode(500, "Image upload failed.");
                 }
-
-                // Trả về tên file đã lưu
-                return Ok(new { FileName = uniqueFileName });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
 
     }

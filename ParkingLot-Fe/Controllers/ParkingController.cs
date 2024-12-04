@@ -27,6 +27,16 @@ namespace ParkingLot_Fe.Controllers
             {
                 string data = response.Content.ReadAsStringAsync().Result;
                 parkinglist = JsonConvert.DeserializeObject<List<MODELParking>>(data);
+
+                // Tạo URL đầy đủ cho hình ảnh
+                string imageBaseUrl = "https://localhost:7167/uploads";
+                foreach (var item in parkinglist)
+                {
+                    if (!string.IsNullOrEmpty(item.Image))
+                    {
+                        item.Image = $"{imageBaseUrl}/{item.Image}";
+                    }
+                }
             }
             return View(parkinglist);
         }
@@ -113,6 +123,17 @@ namespace ParkingLot_Fe.Controllers
                     return Json(new { success = false, message = "Dữ liệu không hợp lệ." });
                 }
 
+                // Kiểm tra tính hợp lệ của ModelState
+                if (!ModelState.IsValid)
+                {
+                    // Trả về danh sách lỗi từ ModelState
+                    var errors = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .ToList();
+
+                    return Json(new { success = false, message = "Dữ liệu không hợp lệ.", errors });
+                }
                 string data = JsonConvert.SerializeObject(model);
                 StringContent content = new StringContent(data, Encoding.UTF8, "application/json");
 

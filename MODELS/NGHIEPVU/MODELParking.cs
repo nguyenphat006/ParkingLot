@@ -33,15 +33,38 @@ namespace MODELS.NGHIEPVU
         public string? Province { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Số lượng không được để trống")]
         public int? TotalSlots { get; set; }
-
         public string? Description { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Thời gian mở cửa chưa chọn")]
         public DateTime? OpenTime { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Thời gian đóng cửa chưa chọn")]
         public DateTime? CloseTime { get; set; }
 
-        public string? OpenTimeFormatted => OpenTime?.ToString("hh:mm tt");
-        public string? CloseTimeFormatted => CloseTime?.ToString("hh:mm tt");
+        //public string? OpenTimeFormatted => OpenTime?.ToString("hh:mm tt");
+        //public string? CloseTimeFormatted => CloseTime?.ToString("hh:mm tt");
+
+        public string? OpenTimeFormatted
+        {
+            get => OpenTime?.ToString("HH:mm tt");
+            set
+            {
+                if (DateTime.TryParse(value, out var time))
+                {
+                    OpenTime = DateTime.Today.Add(time.TimeOfDay);
+                }
+            }
+        }
+
+        public string? CloseTimeFormatted
+        {
+            get => CloseTime?.ToString("HH:mm tt");
+            set
+            {
+                if (DateTime.TryParse(value, out var time))
+                {
+                    CloseTime = DateTime.Today.Add(time.TimeOfDay);
+                }
+            }
+        }
 
     }
 

@@ -66,7 +66,7 @@
                         <label class="col-form-label">
                             Hình ảnh
                         </label>
-                        <input class="form-control" type="file" id="formFile">
+                    @Html.TextBoxFor(model => model.Image, new { @class = "form-control", id = "Image", @readonly = "readonly" })
                     </div>
                 </div>
             </div>

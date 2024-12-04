@@ -8,6 +8,7 @@
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(model => model.Id, new { id = "Id" })
+    @Html.HiddenFor(model => model.Image, new { id = "Image" })
     <div class="modal-header">
         <h4 class="modal-title" id="exampleModalLabel">Thêm mới bãi đậu xe</h4>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopUp()"></button>
@@ -75,15 +76,15 @@
                         @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="col-form-label">
-                            Hình ảnh
-                        </label>
-                        <input class="form-control" type="file" id="formFile">
-                        @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
-                    </div>
-                </div>
+                 <div class="col-md-6">
+                     <div class="mb-3">
+                         <label class="col-form-label">
+                             Hình ảnh
+                         </label>
+                         <input class="form-control" type="file" id="formFile">
+                         @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+                     </div>
+                 </div>
             </div>
 
             <!-- Row 4: Address và District -->
@@ -128,27 +129,28 @@
                 </div>
             </div>
 
-             <!-- Row 7: Open Time và Close Time -->
+            <!-- Row 7: Open Time và Close Time -->
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="col-form-label">
-                            Giờ mở cửa
+                            Thời gian mở cửa
                         </label>
-                        @Html.TextBoxFor(model => model.OpenTime, new { @class = "form-control", id = "OpenTime", type = "time" })
+                        @Html.TextBoxFor(model => model.OpenTimeFormatted, new { @class = "form-control", id = "OpenTime", type = "text", placeholder = "HH:MM AM/PM" })
                         @Html.ValidationMessageFor(model => model.OpenTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="col-form-label">
-                            Giờ đóng cửa
+                            Thời gian đóng cửa
                         </label>
-                        @Html.TextBoxFor(model => model.CloseTime, new { @class = "form-control", id = "CloseTime", type = "time" })
+                        @Html.TextBoxFor(model => model.CloseTimeFormatted, new { @class = "form-control", id = "CloseTime", type = "text", placeholder = "HH:MM AM/PM" })
                         @Html.ValidationMessageFor(model => model.CloseTime, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
+
             <!-- Row 5: Province và Total Slots -->
             <div class="row">
                 <div class="col-md-6">

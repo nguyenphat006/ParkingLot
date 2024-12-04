@@ -4,8 +4,16 @@ using ParkingLot_Api.Endentity;
 using ParkingLot_Api.Entities;
 using FluentValidation.AspNetCore;
 using System.Reflection;
+using CloudinaryDotNet;
+using dotenv.net;
 
 var builder = WebApplication.CreateBuilder(args);
+//Cloudinary cloudinary = new Cloudinary("cloudinary://879366412643585:FLVEchU2i6R9JdX0DjYp7iNk1R8@dtugcnp68");
+
+DotEnv.Load(options: new DotEnvOptions(probeForEnv: true));
+Cloudinary cloudinary = new Cloudinary(Environment.GetEnvironmentVariable("CLOUDINARY_URL"));
+cloudinary.Api.Secure = true;
+
 
 // Add services to the container.
 

@@ -21,14 +21,15 @@
             <table id="add-row" class="display table table-striped table-hover">
                 <thead>
                     <tr>
-                        <th style="width: 5%">STT</th>
-                        <th style="width: 10%">Mã</th>
-                        <th style="width: 20%">Tên bãi đậu xe</th>
-                        <th style="width: 5%">Số chỗ đậu</th>
-                        <th style="width: 20%">Địa chỉ</th>
-                        <th style="width: 10%">Giờ mở cửa</th>
-                        <th style="width: 10%">Giờ đóng cửa</th>
-                        <th style="width: 20%">Chức năng</th>
+                        <th style="width: auto">STT</th>
+                        <th style="width: auto">Hình ảnh</th>
+                    <th style="width: auto">Mã</th>
+                    <th style="width: auto">Tên bãi đậu xe</th>
+                    <th style="width: auto">Số chỗ đậu</th>
+                    <th style="width: auto">Địa chỉ</th>
+                    <th style="width: auto">Giờ mở cửa</th>
+                    <th style="width: auto">Giờ đóng cửa</th>
+                    <th style="width: auto%">Chức năng</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,16 @@
                     {
                         <tr>
                             <td>@stt</td> <!-- Display counter -->
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.Image))
+                                {
+                                    <img src="@item.Image" alt="Hình ảnh" style="width: 100px; height: auto;" />
+                                }
+                                else
+                                {
+                                    <span>Không có ảnh</span>
+                                }
+                            </td>
                             <td>@Html.DisplayFor(modelItem => item.ParkingCode)</td>
                             <td>@Html.DisplayFor(modelItem => item.Name)</td>
                             <td>@Html.DisplayFor(modelItem => item.TotalSlots)</td>
