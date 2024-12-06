@@ -101,7 +101,7 @@ namespace ParkingLot_Fe.Controllers
                 }
 
                 // Trả về PartialView thay vì View
-                return PartialView("~/Views/Parking/PopupDetail.cshtml", obj);
+                return PartialView("~/Views/Parking/PopupEdit.cshtml", obj);
             }
             catch (Exception ex)
             {

@@ -1,0 +1,575 @@
+﻿@model MODELS.NGHIEPVU.MODELParking
+@{
+    ViewData["Title"] = "PopupDetail";
+}
+
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmParking", @class = "forms-sample" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.Id, new { id = "Id" })
+    @Html.HiddenFor(model => model.Image, new { id = "Image" })
+    <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Sửa bãi đậu xe</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopUp()"></button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <!-- Row 1: Parking Code và Name -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mã bãi đậu xe
+                        </label>
+                        @Html.TextBoxFor(model => model.ParkingCode, new { @class = "form-control", id = "ParkingCode" })
+                        @Html.ValidationMessageFor(model => model.ParkingCode, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tên bãi đậu xe
+                        </label>
+                        @Html.TextBoxFor(model => model.Name, new { @class = "form-control", id = "Name" })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Latitude và Longitude -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Vĩ độ
+                        </label>
+                        @Html.TextBoxFor(model => model.Latitude, new { @class = "form-control", id = "Latitude", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Latitude, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Kinh độ
+                        </label>
+                        @Html.TextBoxFor(model => model.Longitude, new { @class = "form-control", id = "Longitude", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Longitude, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-end">
+                    <button type="button" class="btn btn-primary" id="selectLocationButton">Chọn vị trí từ bản đồ</button>
+                </div>
+            </div>
+
+
+            <!-- Row 3: Zip Code và Image -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mã zip
+                        </label>
+                        @Html.TextBoxFor(model => model.ZipCode, new { @class = "form-control", id = "ZipCode" })
+                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Hình ảnh
+                        </label>
+                        <input class="form-control" type="file" id="formFile">
+                        @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 4: Address và District -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Địa chỉ
+                        </label>
+                        @Html.TextBoxFor(model => model.Address, new { @class = "form-control", id = "Address", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tỉnh / Thành Phố
+                        </label>
+                        @Html.TextBoxFor(model => model.Province, new { @class = "form-control", id = "Province", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Province, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Quận / Huyện
+                        </label>
+                        @Html.TextBoxFor(model => model.District, new { @class = "form-control", id = "District", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.District, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Phường / Xã
+                        </label>
+                        @Html.TextBoxFor(model => model.Ward, new { @class = "form-control", id = "Ward", @readonly = "readonly" })
+                        @Html.ValidationMessageFor(model => model.Ward, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 7: Open Time và Close Time -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Thời gian mở cửa
+                        </label>
+                        @Html.TextBoxFor(model => model.OpenTimeFormatted, new { @class = "form-control", id = "OpenTime", type = "text", placeholder = "HH:MM AM/PM" })
+                        @Html.ValidationMessageFor(model => model.OpenTime, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Thời gian đóng cửa
+                        </label>
+                        @Html.TextBoxFor(model => model.CloseTimeFormatted, new { @class = "form-control", id = "CloseTime", type = "text", placeholder = "HH:MM AM/PM" })
+                        @Html.ValidationMessageFor(model => model.CloseTime, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Province và Total Slots -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Tổng số chỗ
+                        </label>
+                        @Html.TextBoxFor(model => model.TotalSlots, new { @class = "form-control", id = "TotalSlots", type = "number" })
+                        @Html.ValidationMessageFor(model => model.TotalSlots, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="col-form-label" for="Status">Trạng thái</label>
+                        @Html.DropDownListFor(model => model.IsActive,
+                                 new SelectList(ViewBag.StatusList, "Value", "Text", Model.IsActive),
+                                 "Chọn trạng thái",
+                                 new { @class = "form-control", id = "IsActive" })
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 6: Description -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="mb-3">
+                        <label class="col-form-label">
+                            Mô tả
+                        </label>
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", id = "Description", rows = 3 })
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" id="btnLuu" class="btn btn-success"><i class="fas fa-check-square"></i> Lưu</button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" onclick="closePopUp()">Đóng</button>
+    </div>
+}
+
+
+<!-- Modal Bootstrap -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true" inert>
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mapModalLabel">Chọn vị trí trên bản đồ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="map">
+                    <div id="left" class="sidebar left collapsed sidebar-map">
+                        <div class="sidebar-header">
+                            <div class="btn-icon" onclick="toggleSidebar('left')">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </div>
+                            <span class="ms-3" style="color: black;">Thông tin địa điểm</span>
+                        </div>
+                        <div class="sidebar-info">
+                            <div class="address">
+                                <p id="full-address" class="address-title"></p>
+                            </div>
+                            <div class="coordinates">
+                                <div class="coordinate-item">
+                                    <span class="label">Latitude (Vĩ độ):</span>
+                                    <span id="latitude-value" class="value">10.945273</span>
+                                </div>
+                                <div class="coordinate-item">
+                                    <span class="label">Longitude (Kinh độ):</span>
+                                    <span id="longitude-value" class="value">106.824964</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="confirmLocation">Xác nhận vị trí</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<script>
+    $(document).on('click', '#btnLuu', async function (event) {
+        event.preventDefault(); // Ngăn hành vi mặc định của nút
+
+        // Lấy file ảnh từ input
+        const fileInput = $('#formFile')[0].files[0];
+
+
+        try {
+            // Upload file ảnh qua API UploadImage
+            const formDataImage = new FormData();
+            formDataImage.append("file", fileInput);
+
+            const uploadResponse = await fetch('/Parking/UploadImage', {
+                method: "POST",
+                body: formDataImage,
+            });
+
+            const uploadResult = await uploadResponse.json();
+            if (!uploadResult.success) {
+                alert(uploadResult.message || "Upload hình ảnh thất bại!");
+                return;
+            }
+
+            const uploadedFileName = JSON.parse(uploadResult.data).fileName; // Chuyển chuỗi JSON thành đối tượng và lấy tên file
+            console.log("File uploaded:", uploadedFileName);
+
+            // Lấy dữ liệu từ form
+            let formData = {
+                ParkingCode: $('#ParkingCode').val().trim(),
+                Name: $('#Name').val().trim(),
+                Latitude: parseFloat($('#Latitude').val()),
+                Longitude: parseFloat($('#Longitude').val()),
+                ZipCode: parseInt($('#ZipCode').val()), // Chuyển sang số nguyên
+                Address: $('#Address').val().trim(),
+                Province: $('#Province').val().trim(),
+                District: $('#District').val().trim(),
+                Ward: $('#Ward').val().trim(),
+                OpenTime: new Date(`1970-01-01T${$('#OpenTime').val()}:00`), // Định dạng ISO 8601
+                CloseTime: new Date(`1970-01-01T${$('#CloseTime').val()}:00`),
+                TotalSlots: parseInt($('#TotalSlots').val()),
+                IsActive: $('#IsActive').val() === "true", // Chuyển sang boolean
+                Description: $('#Description').val().trim(),
+                Image: uploadedFileName // Thêm tên file ảnh vào formData
+            };
+
+            console.log(JSON.stringify(formData));
+
+
+
+            // Gửi dữ liệu qua AJAX
+            $.ajax({
+                url: '/Parking/Post', // Endpoint gọi đến Controller
+                type: "POST",
+                contentType: "application/json", // Dữ liệu dạng JSON
+                data: JSON.stringify(formData), // Chuyển đổi đối tượng formData thành JSON
+                success: function (response) {
+                    // Xử lý phản hồi từ server
+                    if (response.success) {
+                        alert(response.data ? "Cập nhật thành công!" : "Thêm mới thành công!");
+                        closePopUp();
+                        location.reload(); // Làm mới danh sách
+                    } else {
+                        alert(response.message || "Có lỗi xảy ra!");
+                    }
+                },
+                error: function () {
+                    alert("Không thể kết nối đến server. Vui lòng thử lại sau!");
+                }
+            });
+        } catch (error) {
+            console.error("Lỗi upload file:", error);
+            alert("Đã xảy ra lỗi khi upload hình ảnh!");
+        }
+    });
+
+
+
+
+
+
+
+    function closePopUp() {
+        $('#modal-default').modal('hide');
+    }
+
+
+</script>
+
+
+
+
+
+<script>
+    // CÀI ĐẶT MAP
+    goongjs.accessToken = 'yIjIEaQWjb9xRhAcXW7T1ilJSTjmoAFl1u4XjKSH';
+    const map = new goongjs.Map({
+        container: 'map',
+        style: 'https://tiles.goong.io/assets/goong_map_web.json',
+        center: [106.824964, 10.945273],
+        zoom: 13
+    });
+
+
+    // CẬP NHẬT SIZE MAP
+    const mapModal = document.getElementById('mapModal');
+    mapModal.addEventListener('shown.bs.modal', () => {
+        map.resize(); // Cập nhật kích thước bản đồ
+    });
+
+
+    document.getElementById("selectLocationButton").addEventListener("click", function () {
+        var mapModal = document.getElementById("mapModal");
+        mapModal.removeAttribute("inert");
+        var bootstrapModal = new bootstrap.Modal(mapModal);
+        bootstrapModal.show();
+    });
+</script>
+
+
+
+
+
+
+<script>
+    let currentMarker = null; // Biến lưu trữ marker hiện tại
+    let selectedLat = null;
+    let selectedLng = null;
+    let selectedAddress = null;
+
+    // FETCH API ĐỂ LẤY ĐỊA CHỈ TỪ TỌA ĐỘ
+    async function fetchAddressFromCoordinates(lat, lng) {
+        const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW'; // Thay bằng API Key của bạn
+        const url = `https://rsapi.goong.io/Geocode?latlng=${lat},${lng}&api_key=${apiKey}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data && data.results && data.results.length > 0) {
+                const addressComponents = data.results[0].address_components;
+
+                // Update the UI using id selectors
+                document.getElementById("latitude-value").textContent = lat.toFixed(6);
+                document.getElementById("longitude-value").textContent = lng.toFixed(6);
+
+                // Full address (number, street, etc.)
+                const fullAddress = data.results[0].formatted_address || "Không xác định";
+                document.getElementById("full-address").textContent = `${fullAddress}`;
+
+                // Lưu trữ tọa độ và địa chỉ vào các biến toàn cục
+                selectedLat = lat;
+                selectedLng = lng;
+                selectedAddress = fullAddress;
+
+                console.log("Fetched Address:", fullAddress);
+            } else {
+                console.error("No address found for these coordinates.");
+                alert("Không thể lấy địa chỉ từ vị trí này.");
+            }
+        } catch (error) {
+            console.error("Error fetching address:", error);
+            alert("Có lỗi xảy ra khi lấy địa chỉ.");
+        }
+    }
+
+
+    // HÀM XỬ LÝ SỰ KIỆN CLICK TRÊN BẢN ĐỒ
+    function handleMapClick(event) {
+        const { lng, lat } = event.lngLat;
+
+        if (currentMarker) {
+            currentMarker.remove();
+        }
+
+        currentMarker = new goongjs.Marker({
+            color: "blue",
+        })
+            .setLngLat([lng, lat]) // Đảm bảo thứ tự [lng, lat]
+            .addTo(map);
+
+        console.log(`Marker added at: Latitude ${lat}, Longitude ${lng}`);
+        fetchAddressFromCoordinates(lat, lng); // Gọi đúng thứ tự lat, lng
+
+        // Hiển thị sidebar
+        const sidebar = document.getElementById('left');
+        sidebar.classList.remove('collapsed');
+
+    }
+    function toggleSidebar(id) {
+        const elem = document.getElementById(id);
+        const collapsed = elem.classList.contains('collapsed');
+
+        if (collapsed) {
+            elem.classList.remove('collapsed');
+        } else {
+            elem.classList.add('collapsed');
+        }
+    }
+
+
+    // Thêm sự kiện click cho map
+    map.on("click", handleMapClick);
+
+    // Function to get user's current location and move the map
+    function getCurrentLocationAndMoveMap() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    map.flyTo({
+                        center: [userLng, userLat],
+                        zoom: 15,
+                        speed: 1.5,
+                        curve: 1,
+                    });
+
+                    console.log(`User's location: Latitude ${userLat}, Longitude ${userLng}`);
+
+                    if (currentMarker) {
+                        currentMarker.remove();
+                    }
+
+                    currentMarker = new goongjs.Marker({
+                        color: "blue",
+                    })
+                        .setLngLat([userLng, userLat]) // Đảm bảo thứ tự [lng, lat]
+                        .addTo(map);
+                    toggleSidebar('left');
+                    fetchAddressFromCoordinates(userLat, userLng);
+                },
+                (error) => {
+                    console.error("Error getting location: ", error);
+                    alert("Không thể lấy được vị trí của bạn. Vui lòng kiểm tra cài đặt trình duyệt.");
+                }
+            );
+        } else {
+            alert("Trình duyệt của bạn không hỗ trợ chức năng định vị.");
+        }
+    }
+
+    // Add event listener to automatically get the user's location when modal is shown
+    document.getElementById("mapModal").addEventListener("shown.bs.modal", () => {
+        getCurrentLocationAndMoveMap();
+    });
+
+
+
+
+    document.getElementById("confirmLocation").addEventListener("click", () => {
+        if (selectedLat !== null && selectedLng !== null && selectedAddress !== null) {
+            document.getElementById("Latitude").value = selectedLat.toFixed(6);
+            document.getElementById("Longitude").value = selectedLng.toFixed(6);
+            document.getElementById("Address").value = selectedAddress;
+
+            // Close the modal
+            var mapModal = bootstrap.Modal.getInstance(document.getElementById("mapModal"));
+            mapModal.hide();
+            document.getElementById("mapModal").setAttribute("inert", "true");
+        } else {
+            alert("Vui lòng chọn vị trí trên bản đồ trước khi xác nhận.");
+        }
+    });
+</script>
+
+
+
+
+
+@* // FILL ADDRESS DATA TO PROVINCE, DISTRICT, WARD *@
+<script>
+    const apiKey = 'KYkkudSdfBH0NAtFwoHDGFiel5w83BaSaGgevbCW';
+    const addressInput = document.getElementById('Address');
+    const provinceInput = document.getElementById('Province');
+    const districtInput = document.getElementById('District');
+    const wardInput = document.getElementById('Ward');
+    let sessionToken = crypto.randomUUID();
+    const url = `https://rsapi.goong.io/Place/AutoComplete?api_key=${apiKey}&sessiontoken=${sessionToken}`;
+
+    // Hàm xử lý khi địa chỉ được lấy từ bản đồ và cần điền vào các ô input
+    function fillAddressFromMap(addressInput) {
+
+        // Gọi API AutoComplete để lấy place_id từ địa chỉ
+        const urlDetail = `${url}&input=${encodeURIComponent(addressInput)}`;
+
+        fetch(urlDetail)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'OK') {
+                    const place = data.predictions[0]; // Lấy kết quả đầu tiên từ autocomplete
+
+                    // Kiểm tra và điền thông tin vào các ô input từ prediction.compound
+                    if (place.compound) {
+                        // Điền thông tin vào các ô input tương ứng
+                        provinceInput.value = place.compound.province || '';  // Tỉnh / Thành phố
+                        districtInput.value = place.compound.district || '';  // Quận / Huyện
+                        wardInput.value = place.compound.commune || '';  // Phường / Xã
+                    }
+
+                    // Cập nhật ô Address
+                    addressInput.value = place.description;  // Cập nhật địa chỉ vào ô Address
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching address autocomplete data:', error);
+            });
+    }
+
+    // Thêm sự kiện cho nút "Xác nhận vị trí"
+    document.getElementById('confirmLocation').addEventListener('click', function () {
+        // Lấy địa chỉ đã chọn từ bản đồ (ví dụ là từ `addressInput` hoặc dữ liệu khác từ bản đồ)
+        const selectedAddress = addressInput.value;
+
+        // Gọi hàm để điền thông tin vào các ô input
+        fillAddressFromMap(selectedAddress);
+    });
+</script>
+
+
+
+
+
