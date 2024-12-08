@@ -292,11 +292,11 @@ const menuGroups = [
             />
           </svg>
         ),
-        label: "Authentication",
+        label: "Hệ thốngMUI",
         route: "#",
         children: [
-          { label: "Sign In", route: "/auth/signin" },
-          { label: "Sign Up", route: "/auth/signup" },
+          { label: "Quản lý người dùng", route: "/auth/signin" },
+          { label: "Quản lý phân quyền", route: "/auth/signup" },
         ],
       },
     ],

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: "This is Next.js Tables page for NextAdmin Dashboard Kit",
 };
 
-const TablesPage = () => {
+const ParkingLot = () => {
   return (
     <DefaultLayout>
       <Breadcrumb pageName="ParkingLot" />
@@ -25,4 +25,4 @@ const TablesPage = () => {
   );
 };
 
-export default TablesPage;
+export default ParkingLot;

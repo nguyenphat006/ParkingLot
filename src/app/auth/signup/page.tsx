@@ -7,8 +7,8 @@ import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import Signup from "@/components/Auth/Signup";
 
 export const metadata: Metadata = {
-  title: "Next.js Signup Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Signup Page NextAdmin Dashboard Kit",
+  title: "Trang Đăng Ký Next.js | NextAdmin - Bộ Công Cụ Dashboard Next.js",
+  description: "Đây là Trang Đăng Ký Next.js NextAdmin Dashboard Kit",
 };
 
 const SignUp: React.FC = () => {
@@ -41,16 +41,15 @@ const SignUp: React.FC = () => {
                 />
               </Link>
               <p className="mb-3 text-xl font-medium text-dark dark:text-white">
-                Sign up for a new account
+                Đăng ký tài khoản mới
               </p>
 
               <h1 className="mb-4 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
-                Welcome!
+                Chào mừng!
               </h1>
 
               <p className="w-full max-w-[375px] font-medium text-dark-4 dark:text-dark-6">
-                Please sign up for a new account by completing the necessary
-                fields below
+                Vui lòng đăng ký tài khoản mới bằng cách hoàn thành các trường cần thiết bên dưới
               </p>
 
               <div className="mt-31">
