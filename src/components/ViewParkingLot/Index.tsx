@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import PopupDetails from './PopupDetails';
+import PopupView from './PopupView';
 import { ParkingLot } from "@/types/parkinglot";
 
 const packageData: ParkingLot[] = [
@@ -36,9 +37,29 @@ const packageData: ParkingLot[] = [
 
 const TableThree = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [viewId, setViewId] = useState<number | null>(null);
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = () => {
+    setEditId(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (id: number) => {
+    setEditId(id);
+    setIsModalOpen(true);
+  };
+
+  const openViewModal = (id: number) => {
+    setViewId(id);
+    setIsViewModalOpen(true);
+  };
+
   const closeModal = () => setIsModalOpen(false);
+  const closeViewModal = () => setIsViewModalOpen(false);
+
+  const selectedParkingLot = viewId !== null ? packageData[viewId] : null;
 
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
@@ -126,7 +147,7 @@ const TableThree = () => {
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pr-7.5 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
                   <div className="flex items-center justify-end space-x-3.5">
-                    <button className="hover:text-primary">
+                    <button className="hover:text-primary" onClick={() => openViewModal(index)}>
                       <svg
                         className="fill-current"
                         width="20"
@@ -149,6 +170,31 @@ const TableThree = () => {
                         />
                       </svg>
                     </button>
+                    <button className="hover:text-primary" onClick={() => openEditModal(index)}>
+                      <svg
+                        className="fill-current"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M14.1667 2.5C14.4496 2.21705 14.8351 2.21705 15.118 2.5L17.5 4.882C17.7829 5.16495 17.7829 5.55045 17.5 5.8334L7.5 15.8334L2.5 17.5L4.16667 12.5L14.1667 2.5Z"
+                          stroke=""
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M14.1667 2.5C14.4496 2.21705 14.8351 2.21705 15.118 2.5L17.5 4.882C17.7829 5.16495 17.7829 5.55045 17.5 5.8334L7.5 15.8334L2.5 17.5L4.16667 12.5L14.1667 2.5Z"
+                          stroke=""
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
                     <button className="hover:text-primary">
                       <svg
                         className="fill-current"
@@ -159,8 +205,6 @@ const TableThree = () => {
                         xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
                           d="M8.59048 1.87502H11.4084C11.5887 1.8749 11.7458 1.8748 11.8941 1.89849C12.4802 1.99208 12.9874 2.35762 13.2615 2.88403C13.3309 3.01727 13.3805 3.16634 13.4374 3.33745L13.5304 3.61654C13.5461 3.66378 13.5506 3.67715 13.5545 3.68768C13.7004 4.09111 14.0787 4.36383 14.5076 4.3747C14.5189 4.37498 14.5327 4.37503 14.5828 4.37503H17.0828C17.4279 4.37503 17.7078 4.65485 17.7078 5.00003C17.7078 5.34521 17.4279 5.62503 17.0828 5.62503H2.91602C2.57084 5.62503 2.29102 5.34521 2.29102 5.00003C2.29102 4.65485 2.57084 4.37503 2.91602 4.37503H5.41609C5.46612 4.37503 5.47993 4.37498 5.49121 4.3747C5.92009 4.36383 6.29844 4.09113 6.44437 3.6877C6.44821 3.67709 6.45262 3.66401 6.46844 3.61654L6.56145 3.33747C6.61836 3.16637 6.66795 3.01728 6.73734 2.88403C7.01146 2.35762 7.51862 1.99208 8.1047 1.89849C8.25305 1.8748 8.41016 1.8749 8.59048 1.87502ZM7.50614 4.37503C7.54907 4.29085 7.5871 4.20337 7.61983 4.1129C7.62977 4.08543 7.63951 4.05619 7.65203 4.01861L7.7352 3.7691C7.81118 3.54118 7.82867 3.49469 7.84602 3.46137C7.9374 3.2859 8.10645 3.16405 8.30181 3.13285C8.33892 3.12693 8.38854 3.12503 8.6288 3.12503H11.37C11.6103 3.12503 11.6599 3.12693 11.697 3.13285C11.8924 3.16405 12.0614 3.2859 12.1528 3.46137C12.1702 3.49469 12.1877 3.54117 12.2636 3.7691L12.3468 4.01846L12.379 4.11292C12.4117 4.20338 12.4498 4.29085 12.4927 4.37503H7.50614Z"
                           fill=""
                         />
@@ -177,32 +221,7 @@ const TableThree = () => {
                           fill=""
                         />
                       </svg>
-                    </button>
-                    <button className="hover:text-primary">
-                      <svg
-                        className="fill-current"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 20 20"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M14.1667 2.5C14.4496 2.21705 14.8351 2.21705 15.118 2.5L17.5 4.882C17.7829 5.16495 17.7829 5.55045 17.5 5.8334L7.5 15.8334L2.5 17.5L4.16667 12.5L14.1667 2.5Z"
-                          stroke=""
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M14.1667 2.5C14.4496 2.21705 14.8351 2.21705 15.118 2.5L17.5 4.882C17.7829 5.16495 17.7829 5.55045 17.5 5.8334L7.5 15.8334L2.5 17.5L4.16667 12.5L14.1667 2.5Z"
-                          stroke=""
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </button>
+                    </button>                    
                   </div>
                 </td>
               </tr>
@@ -211,6 +230,9 @@ const TableThree = () => {
         </table>
       </div>
       <PopupDetails isOpen={isModalOpen} onRequestClose={closeModal} />
+      {selectedParkingLot && (
+        <PopupView isOpen={isViewModalOpen} onRequestClose={closeViewModal} parkingLot={selectedParkingLot} />
+      )}
     </div>
   );
 };
