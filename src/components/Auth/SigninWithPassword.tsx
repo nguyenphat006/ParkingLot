@@ -44,6 +44,10 @@ export default function SigninWithPassword() {
           title: "Đăng nhập thành công",
           body: "Bạn đã đăng nhập thành công.",
         });
+        if (data.remember) {
+          document.cookie = `username=${data.username}; path=/; max-age=${60 * 60 * 24 * 30}`;
+        }
+        localStorage.setItem("token", result.token);
         setTimeout(() => {
           setAlert(null);
           window.location.href = "/";
