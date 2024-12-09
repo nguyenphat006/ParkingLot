@@ -4,7 +4,12 @@ import Modal from 'react-modal';
 // Ensure the root element exists in your HTML file
 Modal.setAppElement('#__next'); // Adjust this if your root element has a different ID
 
-const PopupDetails = ({ isOpen, onRequestClose }) => {
+interface PopupDetailsProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+}
+
+const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose }) => {
   return (
     <Modal
       isOpen={isOpen}
