@@ -1,3 +1,6 @@
+"use client"
+import React, { useState } from 'react';
+import PopupDetails from './PopupDetails';
 import { ParkingLot } from "@/types/parkinglot";
 
 const packageData: ParkingLot[] = [
@@ -32,10 +35,15 @@ const packageData: ParkingLot[] = [
 ];
 
 const TableThree = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
       <div className="flex justify-between mb-4">
-        <button className="bg-primary text-white px-4 py-2 rounded">
+        <button className="bg-primary text-white px-4 py-2 rounded" onClick={openModal}>
           Thêm mới
         </button>
         <div className="flex space-x-4">
@@ -202,6 +210,7 @@ const TableThree = () => {
           </tbody>
         </table>
       </div>
+      <PopupDetails isOpen={isModalOpen} onRequestClose={closeModal} />
     </div>
   );
 };
