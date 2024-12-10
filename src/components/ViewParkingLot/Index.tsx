@@ -92,13 +92,10 @@ const TableThree = () => {
                 Địa chỉ
               </th>
               <th className="min-w-[120px] px-4 py-4 font-medium text-dark dark:text-white">
-                Website
+                Sức chứa
               </th>
               <th className="px-4 py-4 text-start font-medium text-dark dark:text-white xl:pr-7.5">
-                Thời gian mở
-              </th>
-              <th className="text-start px-4 py-4 font-medium text-dark dark:text-white xl:pr-7.5">
-                Thời gian đóng
+                Sức chứa hiện tại 
               </th>
               <th className="px-4 py-4 text-center font-medium text-dark dark:text-white xl:pr-7.5">
                 Chức năng
@@ -126,23 +123,16 @@ const TableThree = () => {
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
                   <p className="text-dark dark:text-white">
-                    {packageItem.website}
+                    {packageItem.capacity}
                   </p>
                 </td>
                 <td
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
                   <p className="text-dark dark:text-white">
-                    {packageItem.openTime}
+                    {packageItem.AvailableSpots}
                   </p>
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <p className="text-dark dark:text-white">
-                    {packageItem.closeTime}
-                  </p>
-                </td>               
+                </td>                            
                 <td
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pr-7.5 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
