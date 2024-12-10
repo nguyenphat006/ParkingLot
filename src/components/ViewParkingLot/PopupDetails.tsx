@@ -51,6 +51,9 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose }) =
   });
   const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const [name, setName] = useState<string>('');
+  const [capacity, setCapacity] = useState<number | ''>('');
+  const [description, setDescription] = useState<string>('');
 
   const handleToggleContent = () => {
     setShowAdditionalContent(!showAdditionalContent);
@@ -75,6 +78,44 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose }) =
     }
   };
 
+  const handleSave = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found in localStorage');
+      return;
+    }
+
+    const parkingLotData = {
+      name,
+      address,
+      latitude: marker?.latitude,
+      longitude: marker?.longitude,
+      capacity,
+      description
+    };
+
+    try {
+      const response = await fetch('http://localhost:5257/api/ParkingLots', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(parkingLotData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Parking lot added successfully:', data);
+      onRequestClose();
+    } catch (error) {
+      console.error('Error adding parking lot:', error);
+    }
+  };
+
   return (
     <Modal
       open={isOpen}
@@ -87,9 +128,9 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose }) =
           <h2 id="modal-title">Thêm Mới Bãi Đậu Xe</h2>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          <TextField fullWidth label="Tên bãi đậu xe" margin="normal" />
-          <TextField fullWidth label="Sức chứa" margin="normal" />
-          <TextField fullWidth label="Mô tả" margin="normal" />
+          <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
+          <TextField fullWidth label="Sức chứa" margin="normal" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
+          <TextField fullWidth label="Mô tả" margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} />
           <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} />
           <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} />
           <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} />          
@@ -118,7 +159,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose }) =
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Hủy</Button>
-          <Button variant="contained" color="primary">Lưu</Button>
+          <Button variant="contained" color="primary" onClick={handleSave}>Lưu</Button>
         </Box>
       </Box>
     </Modal>
