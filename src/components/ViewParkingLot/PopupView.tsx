@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -9,6 +9,7 @@ interface PopupViewProps {
   isOpen: boolean;
   onRequestClose: () => void;
   parkingLot: any; // Replace 'any' with the appropriate type
+  refreshData: () => void;
 }
 
 const style = {
@@ -43,6 +44,24 @@ const booleanOptions = [
 ];
 
 const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLot }) => {
+  const [parkingLotData, setParkingLotData] = useState(parkingLot);
+
+  useEffect(() => {
+    const fetchParkingLotData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5257/api/ParkingLots/${parkingLot.id}`);
+        const data = await response.json();
+        setParkingLotData(data);
+      } catch (error) {
+        console.error('Error fetching parking lot data:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchParkingLotData();
+    }
+  }, [isOpen, parkingLot.id]);
+
   return (
     <Modal
       open={isOpen}
@@ -55,13 +74,13 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           <h2 id="modal-title">Chi Tiết Bãi Đậu Xe</h2>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={parkingLot.name} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Mô tả" margin="normal" value={parkingLot.description} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Địa chỉ" margin="normal" value={parkingLot.address} InputProps={{ readOnly: true }} sx={{ gridColumn: 'span 2' }} />
-          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={parkingLot.availableSpots} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Sức chứa" margin="normal" value={parkingLot.capacity} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Vĩ độ" margin="normal" value={parkingLot.latitude} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Kinh độ" margin="normal" value={parkingLot.longitude} InputProps={{ readOnly: true }} />          
+          <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={parkingLotData.name} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Mô tả" margin="normal" value={parkingLotData.description} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Địa chỉ" margin="normal" value={parkingLotData.address} InputProps={{ readOnly: true }} sx={{ gridColumn: 'span 2' }} />
+          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={parkingLotData.availableSpots} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Sức chứa" margin="normal" value={parkingLotData.capacity} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Vĩ độ" margin="normal" value={parkingLotData.latitude} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Kinh độ" margin="normal" value={parkingLotData.longitude} InputProps={{ readOnly: true }} />          
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Đóng</Button>

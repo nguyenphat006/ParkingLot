@@ -9,6 +9,17 @@ interface PopupDetailsProps {
   isOpen: boolean;
   children?: React.ReactNode;
   onRequestClose: () => void;
+  parkingLot?: {
+    id: number;
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    capacity: number;
+    description: string;
+    availableSpots: number;
+    isActive: boolean;
+  };
   refreshData: () => void; // Add this line
 }
 
@@ -41,7 +52,7 @@ const footerStyle = {
 const GOONG_API_KEY = 'YJTajS80fLlhJ4a2BG0gXqXXdZzdLG5V3iivOK9e';
 const GOONG_API_ACCESS = 'WlmIT8XtdGdBS6pBOePEve49zUx9waRQDSOXrVRv';
 
-const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, refreshData }) => {
+const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, parkingLot, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
   const [viewport, setViewport] = useState({
     latitude: 21.0278,
@@ -50,11 +61,15 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     bearing: 0,
     pitch: 0
   });
-  const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
-  const [name, setName] = useState<string>('');
-  const [capacity, setCapacity] = useState<number | ''>('');
-  const [description, setDescription] = useState<string>('');
+  const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(
+    parkingLot ? { latitude: parkingLot.latitude, longitude: parkingLot.longitude } : null
+  );
+  const [address, setAddress] = useState<string | null>(parkingLot?.address || null);
+  const [name, setName] = useState<string>(parkingLot?.name || '');
+  const [capacity, setCapacity] = useState<number | ''>(parkingLot?.capacity || '');
+  const [description, setDescription] = useState<string>(parkingLot?.description || '');
+  const [availableSpots, setAvailableSpots] = useState<number | ''>(parkingLot?.availableSpots || '');
+  const [isActive, setIsActive] = useState<boolean>(parkingLot?.isActive || false);
 
   const handleToggleContent = () => {
     setShowAdditionalContent(!showAdditionalContent);
@@ -78,27 +93,40 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       console.error('Error fetching address:', error);
     }
   };
+  const resetFields = () => {
+    setName('');
+    setCapacity('');
+    setDescription('');
+    setAddress(null);
+    setMarker(null);
+    setAvailableSpots('');
+    setIsActive(false);
+  };
 
+  
   const handleSave = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('No token found in localStorage');
+      console.error('Hết thời hạn token');
       window.location.href = '/auth/signin';
       return;
     }
 
     const parkingLotData = {
+      id: parkingLot?.id,
       name,
       address,
       latitude: marker?.latitude,
       longitude: marker?.longitude,
       capacity,
-      description
+      description,
+      availableSpots,
+      isActive
     };
 
     try {
-      const response = await fetch('http://localhost:5257/api/ParkingLots', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5257/api/ParkingLots/${parkingLot?.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -116,38 +144,28 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       }
 
       const data = await response.json();
-      console.log('Parking lot added successfully:', data);
+      console.log('Parking lot updated successfully:', data);
+      resetFields(); // Reset fields after successful save
       onRequestClose();
-      resetFields();
       refreshData(); // Add this line
     } catch (error) {
-      console.error('Error adding parking lot:', error);
+      console.error('Error updating parking lot:', error);
     }
-  };
-
-  const handleClose = () => {
-    onRequestClose();
-    resetFields();
-  };
-
-  const resetFields = () => {
-    setName('');
-    setCapacity('');
-    setDescription('');
-    setAddress(null);
-    setMarker(null);
   };
 
   return (
     <Modal
       open={isOpen}
-      onClose={handleClose}
+      onClose={() => {
+        resetFields(); // Reset fields when modal is closed
+        onRequestClose();
+      }}
       aria-labelledby="parent-modal-title"
       aria-describedby="parent-modal-description"
     >
       <Box sx={style}>
         <Box sx={headerStyle}>
-          <h2 id="modal-title">Thêm Mới Bãi Đậu Xe</h2>
+          <h2 id="modal-title">Sửa Bãi Đậu Xe</h2>
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
           <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
@@ -156,6 +174,21 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
           <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />          
+          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={availableSpots} onChange={(e) => setAvailableSpots(Number(e.target.value))} />
+          <TextField
+            select
+            fullWidth
+            label="Trạng thái"
+            margin="normal"
+            value={isActive ? 'true' : 'false'}
+            onChange={(e) => setIsActive(e.target.value === 'Hoạt động')}
+            SelectProps={{
+              native: true,
+            }}
+          >
+            <option value="Hoạt động">Hoạt động</option>
+            <option value="false">Không hoạt động</option>
+          </TextField>
           <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
             {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
           </Button>
@@ -180,7 +213,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
           )}
         </Box>
         <Box sx={footerStyle}>
-          <Button onClick={handleClose} sx={{ mr: 2 }}>Hủy</Button>
+          <Button onClick={onRequestClose} sx={{ mr: 2 }}>Hủy</Button>
           <Button variant="contained" color="primary" onClick={handleSave}>Lưu</Button>
         </Box>
       </Box>

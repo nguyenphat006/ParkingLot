@@ -1,15 +1,20 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import PopupDetails from './PopupDetails';
+import PopupEdit from './PopupEdit';
 import PopupView from './PopupView';
 import { ParkingLot } from "@/types/parkinglot";
 import { RiEditBoxFill } from "react-icons/ri";
 import { FaTrash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
+import { RiResetLeftFill } from "react-icons/ri";
+
+
 
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [viewId, setViewId] = useState<number | null>(null);
   const [packageData, setPackageData] = useState<ParkingLot[]>([]);
@@ -28,6 +33,16 @@ const Index = () => {
     fetchData();
   }, []);
 
+  const refreshData = async () => {
+    try {
+      const response = await fetch('http://localhost:5257/api/ParkingLots');
+      const data = await response.json();
+      setPackageData(data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   const openModal = () => {
     setEditId(null);
     setIsModalOpen(true);
@@ -35,7 +50,7 @@ const Index = () => {
 
   const openEditModal = (id: number) => {
     setEditId(id);
-    setIsModalOpen(true);
+    setIsEditModalOpen(true);
   };
 
   const openViewModal = (id: number) => {
@@ -43,10 +58,22 @@ const Index = () => {
     setIsViewModalOpen(true);
   };
 
-  const closeModal = () => setIsModalOpen(false);
-  const closeViewModal = () => setIsViewModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    refreshData();
+  };
+  const closeViewModal = () => {
+    setIsViewModalOpen(false);
+    setViewId(null);
+    refreshData();
+  };
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditId(null);
+    refreshData();
+  };
 
-  const selectedParkingLot = viewId !== null ? packageData[viewId] : null;
+  const selectedParkingLot = (viewId !== null ? packageData[viewId] : null) || (editId !== null ? packageData[editId] : null);
 
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
@@ -60,15 +87,15 @@ const Index = () => {
             placeholder="Tìm kiếm..."
             className="border border-stroke px-4 py-2 rounded"
           />
-          <select className="border border-stroke px-4 py-2 rounded">
+          {/* <select className="border border-stroke px-4 py-2 rounded">
             <option value="">Lọc theo....</option>
             <option value="Paid">Paid</option>
             <option value="Unpaid">Unpaid</option>
             <option value="Pending">Pending</option>
-          </select>
+          </select> */}
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto">
+      <div className="max-w-full overflow-x-auto relative">
         <table className="w-full table-auto">
           <thead>
             <tr className="bg-[#F7F9FC] text-left dark:bg-dark-2">
@@ -139,10 +166,14 @@ const Index = () => {
             ))}
           </tbody>
         </table>
+        <RiResetLeftFill className="cursor-pointer text-2xl ml-auto" onClick={refreshData}/>
       </div>
       <PopupDetails isOpen={isModalOpen} onRequestClose={closeModal} />
       {selectedParkingLot && (
-        <PopupView isOpen={isViewModalOpen} onRequestClose={closeViewModal} parkingLot={selectedParkingLot} />
+        <>
+          <PopupView isOpen={isViewModalOpen} onRequestClose={closeViewModal} parkingLot={selectedParkingLot} />
+          <PopupEdit isOpen={isEditModalOpen} onRequestClose={closeEditModal} parkingLot={selectedParkingLot} refreshData={refreshData} />
+        </>
       )}
     </div>
   );
