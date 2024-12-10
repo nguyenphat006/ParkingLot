@@ -7,10 +7,10 @@ import Link from "next/link";
 
 export default function SignupWithPassword() {
   const [data, setData] = useState({
-    username: "",
     email: "",
     password: "",
-    role: "user",
+    firstName: "",
+    lastName: "",
     remember: false,
   });
   const [alert, setAlert] = useState<{ title: string; body: string } | null>(null);
@@ -21,40 +21,62 @@ export default function SignupWithPassword() {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5133/api/Authentication/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        role: data.role,
-      }),
-    });
-    const result = await response.json();
-    if (response.ok) {
-      setAlert({
-        title: "Đăng ký tài khoản thành công",
-        body: "Bạn đã đăng ký tài khoản thành công. Chuyển hướng về trang Home...",
+    try {
+      const response = await fetch("http://localhost:5257/api/Auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          firstName: data.firstName,
+          lastName: data.lastName,
+        }),
       });
-      setTimeout(() => {
-        setAlert(null);
-        window.location.href = "/auth/signin";
-      }, 3000);
-    } else {
-      const errorMessage = result.loi || (Array.isArray(result) ? result.join(", ") : "An error occurred during registration.");
+
+      if (response.status === 204) {
+        setAlert({
+          title: "Đăng ký tài khoản thành công",
+          body: "Bạn đã đăng ký tài khoản thành công. Chuyển hướng về trang Home...",
+        });
+        setTimeout(() => {
+          setAlert(null);
+          window.location.href = "/auth/signin";
+        }, 3000);
+      } else {
+        const result = await response.text();
+        if (response.ok) {
+          setAlert({
+            title: "Đăng ký tài khoản thành công",
+            body: "Bạn đã đăng ký tài khoản thành công. Chuyển hướng về trang Home...",
+          });
+          setTimeout(() => {
+            setAlert(null);
+            window.location.href = "/auth/signin";
+          }, 3000);
+        } else {
+          setError({
+            title: "Đăng ký tài khoản thất bại",
+            body: result,
+          });
+          setTimeout(() => {
+            setError(null);
+          }, 3000);
+          console.error(result);
+        }
+      }
+    } catch (err) {
       setError({
         title: "Đăng ký tài khoản thất bại",
-        body: errorMessage,
+        body: "An unexpected error occurred.",
       });
       setTimeout(() => {
         setError(null);
       }, 3000);
-      console.error(result);
+      console.error(err);
     }
   };
 
@@ -67,17 +89,36 @@ export default function SignupWithPassword() {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
-            htmlFor="username"
+            htmlFor="firstName"
             className="mb-2.5 block font-medium text-dark dark:text-white"
           >
-            Tên tài khoản
+            Tên
           </label>
           <div className="relative">
             <input
               type="text"
-              placeholder="Nhập tên tài khoản của bạn"
-              name="username"
-              value={data.username}
+              placeholder="Nhập tên của bạn"
+              name="firstName"
+              value={data.firstName}
+              onChange={handleChange}
+              className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="lastName"
+            className="mb-2.5 block font-medium text-dark dark:text-white"
+          >
+            Họ
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Nhập họ của bạn"
+              name="lastName"
+              value={data.lastName}
               onChange={handleChange}
               className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
             />
@@ -100,7 +141,6 @@ export default function SignupWithPassword() {
               onChange={handleChange}
               className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
             />
-
             <span className="absolute right-4.5 top-1/2 -translate-y-1/2">
               <svg
                 className="fill-current"
@@ -121,28 +161,6 @@ export default function SignupWithPassword() {
           </div>
         </div>
 
-        <div className="mb-4">
-          <label
-            htmlFor="role-select"
-            className="mb-2.5 block font-medium text-dark dark:text-white"
-          >
-            Vai trò
-          </label>
-          <div className="relative">
-            <select
-              id="role-select"
-              name="role"
-              value={data.role}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="moderator">Moderator</option>
-            </select>
-          </div>
-        </div>
-
         <div className="mb-5">
           <label
             htmlFor="password"
@@ -160,7 +178,6 @@ export default function SignupWithPassword() {
               autoComplete="password"
               className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
             />
-
             <span className="absolute right-4.5 top-1/2 -translate-y-1/2">
               <svg
                 className="fill-current"

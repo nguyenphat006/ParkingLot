@@ -7,7 +7,7 @@ interface Message {
 
 const AlertSuccess: React.FC<{ message: Message }> = ({ message }) => {
   return (
-    <div className="flex w-full rounded-[10px] border-l-6 border-green bg-green-light-7 px-7 py-8 dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9">
+    <div className="flex w-[300px] overflow-hidden rounded-[10px] border-l-6 border-green bg-green-light-7 px-7 py-8 dark:bg-[#1B1B24] dark:bg-opacity-30 md:p-9">
       <div className="mr-5.5 mt-[5px] flex h-8 w-full max-w-8 items-center justify-center rounded-md bg-green">
         <svg
           width="16"

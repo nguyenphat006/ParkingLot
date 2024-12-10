@@ -7,7 +7,7 @@ import AlertError from "../Alerts/AlertError";
 
 export default function SigninWithPassword() {
   const [data, setData] = useState({
-    username: "",
+    email: "",
     password: "",
     remember: false,
   });
@@ -28,16 +28,18 @@ export default function SigninWithPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5133/api/Authentication/login", {
+      const response = await fetch("http://localhost:5257/api/Auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "*/*",
         },
         body: JSON.stringify({
-          username: data.username,
+          email: data.email,
           password: data.password,
         }),
       });
+      console.log(data.email, data.password);
       const result = await response.json();
       if (response.ok) {
         setAlert({
@@ -45,7 +47,7 @@ export default function SigninWithPassword() {
           body: "Bạn đã đăng nhập thành công.",
         });
         if (data.remember) {
-          document.cookie = `username=${data.username}; path=/; max-age=${60 * 60 * 24 * 30}`;
+          document.cookie = `username=${data.email}; path=/; max-age=${60 * 60 * 24 * 30}`;
         }
         localStorage.setItem("token", result.token);
         setTimeout(() => {
@@ -84,7 +86,7 @@ export default function SigninWithPassword() {
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
-            htmlFor="username"
+            htmlFor="email"
             className="mb-2.5 block font-medium text-dark dark:text-white"
           >
             Tài khoản
@@ -93,8 +95,8 @@ export default function SigninWithPassword() {
             <input
               type="text"
               placeholder="Nhập tài khoản của bạn"
-              name="username"
-              value={data.username}
+              name="email"
+              value={data.email}
               onChange={handleChange}
               className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
             />
