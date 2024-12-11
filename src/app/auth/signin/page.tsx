@@ -27,17 +27,17 @@ const SignIn: React.FC = () => {
               <Link className="mb-10 inline-block" href="/">
                 <Image
                   className="hidden dark:block"
-                  src={"/images/logo/logo.svg"}
+                  src={"/images/PARKING.png"}
                   alt="Logo"
-                  width={176}
+                  width={356}
                   height={32}
                 />
                 <Image
                   className="dark:hidden"
-                  src={"/images/logo/logo-dark.svg"}
+                  src={"/images/PARKING.png"}
                   alt="Logo"
-                  width={176}
-                  height={32}
+                  width={356}
+                  height={52}
                 />
               </Link>
               <p className="mb-3 text-xl font-medium text-dark dark:text-white">

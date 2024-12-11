@@ -24,20 +24,20 @@ const SignUp: React.FC = () => {
 
           <div className="hidden lg:block w-full p-9 lg:w-2/5">
             <div className="custom-gradient-1 overflow-hidden rounded-2xl px-12.5 pt-12.5 dark:!bg-dark-2 dark:bg-none">
-              <Link className="mb-10 inline-block" href="/">
+             <Link className="mb-10 inline-block" href="/">
                 <Image
                   className="hidden dark:block"
-                  src={"/images/logo/logo.svg"}
+                  src={"/images/PARKING.png"}
                   alt="Logo"
-                  width={176}
+                  width={356}
                   height={32}
                 />
                 <Image
                   className="dark:hidden"
-                  src={"/images/logo/logo-dark.svg"}
+                  src={"/images/PARKING.png"}
                   alt="Logo"
-                  width={176}
-                  height={32}
+                  width={356}
+                  height={52}
                 />
               </Link>
               <p className="mb-3 text-xl font-medium text-dark dark:text-white">

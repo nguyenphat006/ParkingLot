@@ -12,6 +12,7 @@ export default function SignupWithPassword() {
     firstName: "",
     lastName: "",
     remember: false,
+    role: "User", // default role
   });
   const [alert, setAlert] = useState<{ title: string; body: string } | null>(null);
   const [error, setError] = useState<{ title: string; body: string } | null>(null);
@@ -34,6 +35,7 @@ export default function SignupWithPassword() {
           password: data.password,
           firstName: data.firstName,
           lastName: data.lastName,
+          role: data.role,
         }),
       });
 
@@ -201,6 +203,26 @@ export default function SignupWithPassword() {
                 />
               </svg>
             </span>
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="role"
+            className="mb-2.5 block font-medium text-dark dark:text-white"
+          >
+            Vai trò
+          </label>
+          <div className="relative">
+            <select
+              name="role"
+              value={data.role}
+              onChange={handleChange}
+              className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+            >
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
           </div>
         </div>
 

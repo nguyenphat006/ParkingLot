@@ -4,6 +4,8 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import MapGL, { Marker } from '@goongmaps/goong-map-react';
+import AlertSuccess from "../Alerts/AlertSuccess";
+import AlertError from "../Alerts/AlertError";
 
 interface PopupDetailsProps {
   isOpen: boolean;
@@ -49,8 +51,8 @@ const footerStyle = {
   justifyContent: 'flex-end'
 };
 
-const GOONG_API_KEY = 'YJTajS80fLlhJ4a2BG0gXqXXdZzdLG5V3iivOK9e';
-const GOONG_API_ACCESS = 'WlmIT8XtdGdBS6pBOePEve49zUx9waRQDSOXrVRv';
+const GOONG_MAPTILES_KEY = 'jQz7dTS6LtjN9z5JjoBFc7fQ2stAk4UocQnvm51F';
+const GOONG_API_KEY = 'zR0c6DjYs3YWpvi5zSfywPUPesH2G1Liy7rqfVin';
 
 const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, parkingLot, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
@@ -70,6 +72,8 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
   const [description, setDescription] = useState<string>(parkingLot?.description || '');
   const [availableSpots, setAvailableSpots] = useState<number | ''>(parkingLot?.availableSpots || '');
   const [isActive, setIsActive] = useState<boolean>(parkingLot?.isActive || false);
+  const [alert, setAlert] = useState<{ title: string; body: string } | null>(null);
+  const [error, setError] = useState<{ title: string; body: string } | null>(null);
 
   const handleToggleContent = () => {
     setShowAdditionalContent(!showAdditionalContent);
@@ -81,7 +85,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
     console.log(`Coordinates: ${latitude}, ${longitude}`);
 
     try {
-      const response = await fetch(`https://rsapi.goong.io/Geocode?latlng=${latitude},${longitude}&api_key=${GOONG_API_ACCESS}`);
+      const response = await fetch(`https://rsapi.goong.io/Geocode?latlng=${latitude},${longitude}&api_key=${GOONG_API_KEY}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -145,11 +149,25 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
 
       const data = await response.json();
       console.log('Parking lot updated successfully:', data);
-      resetFields(); // Reset fields after successful save
-      onRequestClose();
-      refreshData(); // Add this line
+      setAlert({
+        title: "Cập nhật bãi đậu xe thành công",
+        body: "Bãi đậu xe đã được cập nhật thành công.",
+      });
+      setTimeout(() => {
+        setAlert(null);
+        resetFields(); // Reset fields after successful save
+        onRequestClose();
+        refreshData(); // Add this line
+      }, 3000);
     } catch (error) {
       console.error('Error updating parking lot:', error);
+      setError({
+        title: "Cập nhật bãi đậu xe thất bại",
+        body: "Đã xảy ra lỗi khi cập nhật bãi đậu xe.",
+      });
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
     }
   };
 
@@ -163,60 +181,66 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
       aria-labelledby="parent-modal-title"
       aria-describedby="parent-modal-description"
     >
-      <Box sx={style}>
-        <Box sx={headerStyle}>
-          <h2 id="modal-title">Sửa Bãi Đậu Xe</h2>
+      <div>
+        <div className="fixed top-4 right-4 transition-transform duration-300 transform" style={{ transform: alert || error ? 'translateY(0)' : 'translateY(-100%)' }}>
+          {alert && <AlertSuccess message={alert} />}
+          {error && <AlertError message={error} />}
+        </div>
+        <Box sx={style}>
+          <Box sx={headerStyle}>
+            <h2 id="modal-title">Sửa Bãi Đậu Xe</h2>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
+            <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
+            <TextField fullWidth label="Sức chứa" margin="normal" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
+            <TextField fullWidth label="Mô tả" margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} />
+            <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />          
+            <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={availableSpots} onChange={(e) => setAvailableSpots(Number(e.target.value))} />
+            <TextField
+              select
+              fullWidth
+              label="Trạng thái"
+              margin="normal"
+              value={isActive ? 'true' : 'false'}
+              onChange={(e) => setIsActive(e.target.value === 'Hoạt động')}
+              SelectProps={{
+                native: true,
+              }}
+            >
+              <option value="Hoạt động">Hoạt động</option>
+              <option value="false">Không hoạt động</option>
+            </TextField>
+            <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
+              {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
+            </Button>
+            {showAdditionalContent && (
+              <Box sx={{ gridColumn: 'span 2', height: '400px' }}>
+                <MapGL
+                  {...viewport}
+                  width="100%"
+                  height="100%"
+                  mapStyle="https://tiles.goong.io/assets/goong_map_web.json"
+                  onViewportChange={setViewport}
+                  goongApiAccessToken={GOONG_MAPTILES_KEY}
+                  onClick={handleMapClick}
+                >
+                  {marker && (
+                    <Marker latitude={marker.latitude} longitude={marker.longitude} offsetLeft={-15} offsetTop={-30}>
+                      <img src="/images/marker.png" alt="Marker" style={{ width: '30px', height: '30px' }} />
+                    </Marker>
+                  )}
+                </MapGL>
+              </Box>
+            )}
+          </Box>
+          <Box sx={footerStyle}>
+            <Button onClick={onRequestClose} sx={{ mr: 2 }}>Hủy</Button>
+            <Button variant="contained" color="primary" onClick={handleSave}>Lưu</Button>
+          </Box>
         </Box>
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-          <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
-          <TextField fullWidth label="Sức chứa" margin="normal" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
-          <TextField fullWidth label="Mô tả" margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />          
-          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={availableSpots} onChange={(e) => setAvailableSpots(Number(e.target.value))} />
-          <TextField
-            select
-            fullWidth
-            label="Trạng thái"
-            margin="normal"
-            value={isActive ? 'true' : 'false'}
-            onChange={(e) => setIsActive(e.target.value === 'Hoạt động')}
-            SelectProps={{
-              native: true,
-            }}
-          >
-            <option value="Hoạt động">Hoạt động</option>
-            <option value="false">Không hoạt động</option>
-          </TextField>
-          <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
-            {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
-          </Button>
-          {showAdditionalContent && (
-            <Box sx={{ gridColumn: 'span 2', height: '400px' }}>
-              <MapGL
-                {...viewport}
-                width="100%"
-                height="100%"
-                mapStyle="https://tiles.goong.io/assets/goong_map_web.json"
-                onViewportChange={setViewport}
-                goongApiAccessToken={GOONG_API_KEY}
-                onClick={handleMapClick}
-              >
-                {marker && (
-                  <Marker latitude={marker.latitude} longitude={marker.longitude} offsetLeft={-15} offsetTop={-30}>
-                    <img src="/images/marker.png" alt="Marker" style={{ width: '30px', height: '30px' }} />
-                  </Marker>
-                )}
-              </MapGL>
-            </Box>
-          )}
-        </Box>
-        <Box sx={footerStyle}>
-          <Button onClick={onRequestClose} sx={{ mr: 2 }}>Hủy</Button>
-          <Button variant="contained" color="primary" onClick={handleSave}>Lưu</Button>
-        </Box>
-      </Box>
+      </div>
     </Modal>
   );
 };
