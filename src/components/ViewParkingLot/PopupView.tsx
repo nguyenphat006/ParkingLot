@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
+import { ParkingLot } from "@/types/parkinglot";
 
 interface PopupViewProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  parkingLot: any; // Replace 'any' with the appropriate type
-  refreshData: () => void;
+  parkingLot: ParkingLot;
 }
 
 const style = {
@@ -38,13 +37,8 @@ const footerStyle = {
   justifyContent: 'flex-end'
 };
 
-const booleanOptions = [
-  { value: true, label: 'Có' },
-  { value: false, label: 'Không' }
-];
-
 const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLot }) => {
-  const [parkingLotData, setParkingLotData] = useState(parkingLot);
+  const [parkingLotData, setParkingLotData] = useState<ParkingLot | null>(null);
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -56,7 +50,7 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
       }
 
       try {
-        const response = await fetch(`http://localhost:5257/api/ParkingLots/${parkingLot.id}`, {
+        const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -74,6 +68,10 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
     }
   }, [isOpen, parkingLot.id]);
 
+  if (!parkingLotData) {
+    return null;
+  }
+
   return (
     <Modal
       open={isOpen}
@@ -88,11 +86,13 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
           <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={parkingLotData.name} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Mô tả" margin="normal" value={parkingLotData.description} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Địa chỉ" margin="normal" value={parkingLotData.address} InputProps={{ readOnly: true }} sx={{ gridColumn: 'span 2' }} />
-          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={parkingLotData.availableSpots} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Sức chứa" margin="normal" value={parkingLotData.capacity} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Vĩ độ" margin="normal" value={parkingLotData.latitude} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Kinh độ" margin="normal" value={parkingLotData.longitude} InputProps={{ readOnly: true }} />          
+          <TextField fullWidth label="Địa chỉ" margin="normal" value={parkingLotData.formatted_address} InputProps={{ readOnly: true }} sx={{ gridColumn: 'span 2' }} />
+          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={parkingLotData.available_spaces} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Sức chứa" margin="normal" value={parkingLotData.total_spaces} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={parkingLotData.formatted_phone_number} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giờ mở cửa" margin="normal" value={parkingLotData.openingtime} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={parkingLotData.closingtime} InputProps={{ readOnly: true }} />
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Đóng</Button>

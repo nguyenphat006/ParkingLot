@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -6,23 +6,13 @@ import Button from '@mui/material/Button';
 import MapGL, { Marker } from '@goongmaps/goong-map-react';
 import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
+import { ParkingLot } from "@/types/parkinglot";
 
-interface PopupDetailsProps {
+interface PopupEditProps {
   isOpen: boolean;
-  children?: React.ReactNode;
   onRequestClose: () => void;
-  parkingLot?: {
-    id: number;
-    name: string;
-    address: string;
-    latitude: number;
-    longitude: number;
-    capacity: number;
-    description: string;
-    availableSpots: number;
-    isActive: boolean;
-  };
-  refreshData: () => void; // Add this line
+  parkingLot: ParkingLot;
+  refreshData: () => void;
 }
 
 const style = {
@@ -30,7 +20,9 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 1200,
+  width: '90%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
@@ -54,7 +46,7 @@ const footerStyle = {
 const GOONG_MAPTILES_KEY = 'jQz7dTS6LtjN9z5JjoBFc7fQ2stAk4UocQnvm51F';
 const GOONG_API_KEY = 'zR0c6DjYs3YWpvi5zSfywPUPesH2G1Liy7rqfVin';
 
-const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, parkingLot, refreshData }) => {
+const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLot, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
   const [viewport, setViewport] = useState({
     latitude: 21.0278,
@@ -63,17 +55,72 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
     bearing: 0,
     pitch: 0
   });
-  const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(
-    parkingLot ? { latitude: parkingLot.latitude, longitude: parkingLot.longitude } : null
-  );
-  const [address, setAddress] = useState<string | null>(parkingLot?.address || null);
-  const [name, setName] = useState<string>(parkingLot?.name || '');
-  const [capacity, setCapacity] = useState<number | ''>(parkingLot?.capacity || '');
-  const [description, setDescription] = useState<string>(parkingLot?.description || '');
-  const [availableSpots, setAvailableSpots] = useState<number | ''>(parkingLot?.availableSpots || '');
-  const [isActive, setIsActive] = useState<boolean>(parkingLot?.isActive || false);
+  const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
+  const [name, setName] = useState<string>('');
+  const [capacity, setCapacity] = useState<number | ''>('');
+  const [description, setDescription] = useState<string>('');
   const [alert, setAlert] = useState<{ title: string; body: string } | null>(null);
   const [error, setError] = useState<{ title: string; body: string } | null>(null);
+  const [closingTime, setClosingTime] = useState<string>('');
+  const [openingTime, setOpeningTime] = useState<string>('');
+  const [plusCodeCompound, setPlusCodeCompound] = useState<string>('');
+  const [contactNumber, setContactNumber] = useState<string>('');
+  const [plusCodeGlobal, setPlusCodeGlobal] = useState<string>('');
+  const [url, setUrl] = useState<string>('');
+  const [totalSpaces, setTotalSpaces] = useState<number | ''>('');
+  const [compoundDistrict, setCompoundDistrict] = useState<string>('');
+  const [formattedAddress, setFormattedAddress] = useState<string>('');
+  const [compoundProvince, setCompoundProvince] = useState<string>('');
+  const [placeId, setPlaceId] = useState<string>('');
+  const [availableSpaces, setAvailableSpaces] = useState<number | ''>('');
+  const [pricePerHour, setPricePerHour] = useState<number | ''>('');
+  const [isOpen24Hours, setIsOpen24Hours] = useState<boolean>(false);
+  const [compoundCommune, setCompoundCommune] = useState<string>('');
+
+  useEffect(() => {
+    const fetchParkingLotData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found in localStorage');
+        window.location.href = '/auth/signin';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        setName(data.name);
+        setAddress(data.formatted_address);
+        setMarker({ latitude: data.geometry.location.lat, longitude: data.geometry.location.lng });
+        setDescription(data.description);
+        setAvailableSpaces(data.available_spaces);
+        setPricePerHour(data.price_per_hour);
+        setOpeningTime(data.openingtime);
+        setClosingTime(data.closingtime);
+        setContactNumber(data.formatted_phone_number);
+        setTotalSpaces(data.total_spaces);
+        setIsOpen24Hours(data.isOpen24Hours);
+        setCompoundProvince(data.compound.province);
+        setCompoundDistrict(data.compound.district);
+        setCompoundCommune(data.compound.commune);
+        setPlaceId(data.place_id);
+        setPlusCodeGlobal(data.plus_code.global_code);
+        setPlusCodeCompound(data.plus_code.compound_code);
+      } catch (error) {
+        console.error('Error fetching parking lot data:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchParkingLotData();
+    }
+  }, [isOpen, parkingLot.id]);
 
   const handleToggleContent = () => {
     setShowAdditionalContent(!showAdditionalContent);
@@ -93,49 +140,59 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
       const address = data.results[0]?.formatted_address;
       setAddress(address);
       console.log(`Address: ${address}`);
+
+      const compound = data.results[0]?.compound;
+      const province = compound?.province;
+      const district = compound?.district;
+      const commune = compound?.commune;
+      const placeId = data.results[0]?.place_id;
+
+      setCompoundProvince(province || '');
+      setCompoundDistrict(district || '');
+      setCompoundCommune(commune || '');
+      setPlaceId(placeId || '');
+      setPlusCodeGlobal(plusCodeGlobal || '');
+      setPlusCodeCompound(plusCodeCompound || '');
     } catch (error) {
       console.error('Error fetching address:', error);
     }
   };
-  const resetFields = () => {
-    setName('');
-    setCapacity('');
-    setDescription('');
-    setAddress(null);
-    setMarker(null);
-    setAvailableSpots('');
-    setIsActive(false);
-  };
 
-  
   const handleSave = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
-      console.error('Hết thời hạn token');
+      console.error('No token found in localStorage');
       window.location.href = '/auth/signin';
       return;
     }
 
-    const parkingLotData = {
-      id: parkingLot?.id,
-      name,
-      address,
-      latitude: marker?.latitude,
-      longitude: marker?.longitude,
-      capacity,
-      description,
-      availableSpots,
-      isActive
-    };
+    const formData = new FormData();
+    formData.append('Name', name);
+    formData.append('Types', 'parkinglot');
+    formData.append('Place_id', placeId);
+    formData.append('ClosingTime', closingTime);
+    formData.append('OpeningTime', openingTime);
+    formData.append('TotalSpaces', totalSpaces.toString());
+    formData.append('PricePerHour', pricePerHour.toString());
+    formData.append('IsOpen24Hours', isOpen24Hours.toString());
+    formData.append('AvailableSpaces', availableSpaces.toString());
+    formData.append('Formatted_address', address);
+    formData.append('Compound.Commune', compoundCommune);
+    formData.append('Compound.District', compoundDistrict);
+    formData.append('Compound.Province', compoundProvince);
+    formData.append('Geometry.Location.Lat', marker?.latitude.toString());
+    formData.append('Geometry.Location.Lng', marker?.longitude.toString());
+    formData.append('ContactNumber', contactNumber);
+    formData.append('Url', url);
+    formData.append('Description', description);
 
     try {
-      const response = await fetch(`http://localhost:5257/api/ParkingLots/${parkingLot?.id}`, {
+      const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(parkingLotData)
+        body: formData
       });
 
       if (response.status === 401) {
@@ -155,9 +212,8 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
       });
       setTimeout(() => {
         setAlert(null);
-        resetFields(); // Reset fields after successful save
         onRequestClose();
-        refreshData(); // Add this line
+        refreshData();
       }, 3000);
     } catch (error) {
       console.error('Error updating parking lot:', error);
@@ -174,12 +230,9 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
   return (
     <Modal
       open={isOpen}
-      onClose={() => {
-        resetFields(); // Reset fields when modal is closed
-        onRequestClose();
-      }}
-      aria-labelledby="parent-modal-title"
-      aria-describedby="parent-modal-description"
+      onClose={onRequestClose}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
     >
       <div>
         <div className="fixed top-4 right-4 transition-transform duration-300 transform" style={{ transform: alert || error ? 'translateY(0)' : 'translateY(-100%)' }}>
@@ -192,26 +245,20 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
             <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
-            <TextField fullWidth label="Sức chứa" margin="normal" value={capacity} onChange={(e) => setCapacity(Number(e.target.value))} />
             <TextField fullWidth label="Mô tả" margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} />
             <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} InputProps={{ readOnly: true }} />
             <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
-            <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />          
-            <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={availableSpots} onChange={(e) => setAvailableSpots(Number(e.target.value))} />
-            <TextField
-              select
-              fullWidth
-              label="Trạng thái"
-              margin="normal"
-              value={isActive ? 'true' : 'false'}
-              onChange={(e) => setIsActive(e.target.value === 'Hoạt động')}
-              SelectProps={{
-                native: true,
-              }}
-            >
-              <option value="Hoạt động">Hoạt động</option>
-              <option value="false">Không hoạt động</option>
-            </TextField>
+            <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />  
+            <TextField fullWidth label="Tỉnh thành" margin="normal" value={compoundProvince} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Quận huyện" margin="normal" value={compoundDistrict} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Phường xã" margin="normal" value={compoundCommune} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={closingTime} onChange={(e) => setClosingTime(e.target.value)} />
+            <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingTime} onChange={(e) => setOpeningTime(e.target.value)} />
+            <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />           
+            <TextField fullWidth label="Tổng số chỗ" margin="normal" value={totalSpaces} onChange={(e) => setTotalSpaces(Number(e.target.value))} />
+            <TextField fullWidth label="Số chỗ trống" margin="normal" value={availableSpaces} onChange={(e) => setAvailableSpaces(Number(e.target.value))} />
+            <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={pricePerHour} onChange={(e) => setPricePerHour(Number(e.target.value))} />
+            <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" value={isOpen24Hours} onChange={(e) => setIsOpen24Hours(e.target.checked)} type="checkbox" />            
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>
@@ -245,4 +292,4 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, par
   );
 };
 
-export default PopupDetails;
+export default PopupEdit;
