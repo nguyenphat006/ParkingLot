@@ -40,6 +40,7 @@ const footerStyle = {
 const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLot }) => {
   const [parkingLotData, setParkingLotData] = useState<ParkingLot | null>(null);
   const [openingHours, setOpeningHours] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -61,6 +62,9 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
         const parkingLotDetails = data.result.parkingLot;
         setParkingLotData(parkingLotDetails);
         setOpeningHours(parkingLotDetails.opening_hours.weekday_text[0]);
+        if (parkingLotDetails.photos && parkingLotDetails.photos.length > 0) {
+          setImageUrl(`http://localhost:8000${parkingLotDetails.photos[0].photo_reference}`);
+        }
       } catch (error) {
         console.error('Error fetching parking lot data:', error);
       }
@@ -95,6 +99,16 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={parkingLotData.formatted_phone_number} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingHours} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" value={parkingLotData.isOpen24Hours ? 'Có' : 'Không'} InputProps={{ readOnly: true }} />
+          <Box sx={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ width: '200px', height: '200px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {imageUrl ? (
+                <img src={imageUrl} alt="Parking Lot" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+              ) : (
+                <span>No Image</span>
+              )}
+            </Box>
+          </Box>
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Đóng</Button>
