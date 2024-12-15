@@ -58,8 +58,9 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           }
         });
         const data = await response.json();
-        setParkingLotData(data);
-        setOpeningHours(data.opening_hours.weekday_text[0]);
+        const parkingLotDetails = data.result.parkingLot;
+        setParkingLotData(parkingLotDetails);
+        setOpeningHours(parkingLotDetails.opening_hours.weekday_text[0]);
       } catch (error) {
         console.error('Error fetching parking lot data:', error);
       }
@@ -93,7 +94,7 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           <TextField fullWidth label="Số chỗ trống" margin="normal" value={parkingLotData.available_spaces} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={parkingLotData.formatted_phone_number} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="" margin="normal" value={openingHours} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingHours} InputProps={{ readOnly: true }} />
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Đóng</Button>

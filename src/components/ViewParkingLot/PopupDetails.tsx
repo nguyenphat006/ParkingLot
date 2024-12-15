@@ -7,7 +7,7 @@ import MapGL, { Marker } from '@goongmaps/goong-map-react';
 import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
 import Autocomplete from '@mui/material/Autocomplete';
-import Select from '@mui/material/Select';
+// import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Input from '@mui/material/Input';
 
@@ -154,12 +154,12 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     formData.append('PricePerHour', pricePerHour.toString());
     formData.append('IsOpen24Hours', isOpen24Hours ? 'true' : 'false');
     formData.append('AvailableSpaces', availableSpaces.toString());
-    formData.append('Formatted_address', address);
+    formData.append('Formatted_address', address || '');
     formData.append('Compound.Commune', 'Sample Commune');
     formData.append('Compound.District', 'Sample District');
     formData.append('Compound.Province', 'Sample Province');
-    formData.append('Geometry.Location.Lat', marker?.latitude.toString());
-    formData.append('Geometry.Location.Lng', marker?.longitude.toString());
+    formData.append('Geometry.Location.Lat', marker?.latitude.toString() || '');
+    formData.append('Geometry.Location.Lng', marker?.longitude.toString() || '');
     formData.append('ContactNumber', contactNumber);
     formData.append('Url', url);
     formData.append('Description', description);
@@ -235,8 +235,8 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     setFile(null);
   };
 
-  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
+  const handleSearchChange = async (event: React.SyntheticEvent<Element, Event>, value: string) => {
+    const query = value;
     setSearchQuery(query);
 
     if (query.length > 2) {
@@ -421,7 +421,27 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               placeholder="HH:mm"
               InputProps={{ readOnly: isOpen24Hours }}
             />
-            <Input type="file" onChange={handleFileChange} sx={{ gridColumn: 'span 2' }} />
+            <Box sx={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ width: '200px', height: '200px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {file ? (
+                  <img src={URL.createObjectURL(file)} alt="Parking Lot" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                ) : (
+                  <span>No Image</span>
+                )}
+              </Box>
+              <label htmlFor="file-upload">
+                <Input
+                  id="file-upload"
+                  type="file"
+                  onChange={handleFileChange}
+                  inputProps={{ accept: 'image/*' }}
+                  style={{ display: 'none' }}
+                />
+                <Button variant="contained" component="span">
+                  {file ? file.name : 'Chọn tệp'}
+                </Button>
+              </label>
+            </Box>
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>
@@ -431,7 +451,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
                   freeSolo
                   options={searchResults}
                   getOptionLabel={(option) => option.description}
-                  onInputChange={handleSearchChange}
+                  onInputChange={(event, value) => handleSearchChange(event, value)}
                   onChange={handleSearchSelect}
                   renderInput={(params) => (
                     <TextField {...params} label="Tìm kiếm địa điểm" margin="normal" sx={{ position: 'absolute', top: 0, left: 0, zIndex: 1, width: '100%' }} />

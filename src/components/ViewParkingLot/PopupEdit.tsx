@@ -6,9 +6,7 @@ import Button from '@mui/material/Button';
 import MapGL, { Marker } from '@goongmaps/goong-map-react';
 import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
-import { ParkingLot } from "@/types/parkinglot";
 import Autocomplete from '@mui/material/Autocomplete';
-import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Input from '@mui/material/Input';
 
@@ -80,6 +78,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -98,18 +97,24 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
           }
         });
         const data = await response.json();
-        setName(data.name);
-        setAddress(data.formatted_address);
-        setMarker({ latitude: data.geometry.location.lat, longitude: data.geometry.location.lng });
-        setDescription(data.description);
-        setAvailableSpaces(data.available_spaces);
-        setPricePerHour(data.price_per_hour);
-        setOpeningTime(data.openingtime);
-        setClosingTime(data.closingtime);
-        setContactNumber(data.formatted_phone_number);
-        setTotalSpaces(data.total_spaces);
-        setIsOpen24Hours(data.isOpen24Hours);
-        setPlaceId(data.place_id);
+        const parkingLotDetails = data.result.parkingLot;
+        setName(parkingLotDetails.name);
+        setAddress(parkingLotDetails.formatted_address);
+        if (parkingLotDetails.geometry && parkingLotDetails.geometry.location) {
+          setMarker({ latitude: parkingLotDetails.geometry.location.lat, longitude: parkingLotDetails.geometry.location.lng });
+        }
+        setDescription(parkingLotDetails.description);
+        setAvailableSpaces(parkingLotDetails.available_spaces);
+        setPricePerHour(parkingLotDetails.price_per_hour);
+        setOpeningTime(parkingLotDetails.opening_hours.weekday_text[0]);
+        setClosingTime(parkingLotDetails.opening_hours.weekday_text[0]);
+        setContactNumber(parkingLotDetails.formatted_phone_number);
+        setTotalSpaces(parkingLotDetails.total_spaces);
+        setIsOpen24Hours(parkingLotDetails.isOpen24Hours);
+        setPlaceId(parkingLotDetails.place_id);
+        if (parkingLotDetails.photos && parkingLotDetails.photos.length > 0) {
+          setImageUrl(`http://localhost:8000${parkingLotDetails.photos[0].photo_reference}`);
+        }
       } catch (error) {
         console.error('Error fetching parking lot data:', error);
       }
@@ -146,13 +151,12 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
     }
   };
 
-  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
-    setSearchQuery(query);
+  const handleSearchChange = async (event: React.SyntheticEvent<Element, Event>, value: string) => {
+    setSearchQuery(value);
 
-    if (query.length > 2) {
+    if (value.length > 2) {
       try {
-        const response = await fetch(`https://rsapi.goong.io/Place/AutoComplete?input=${query}&api_key=${GOONG_API_KEY}`);
+        const response = await fetch(`https://rsapi.goong.io/Place/AutoComplete?input=${value}&api_key=${GOONG_API_KEY}`);
         const data = await response.json();
         setSearchResults(data.predictions || []);
       } catch (error) {
@@ -198,6 +202,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setFile(event.target.files[0]);
+      setImageUrl(URL.createObjectURL(event.target.files[0]));
     }
   };
 
@@ -232,12 +237,12 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
     formData.append('PricePerHour', pricePerHour.toString());
     formData.append('IsOpen24Hours', isOpen24Hours ? 'true' : 'false');
     formData.append('AvailableSpaces', availableSpaces.toString());
-    formData.append('Formatted_address', address);
+    formData.append('Formatted_address', address || '');
     formData.append('Compound.Commune', 'Sample Commune');
     formData.append('Compound.District', 'Sample District');
     formData.append('Compound.Province', 'Sample Province');
-    formData.append('Geometry.Location.Lat', marker?.latitude.toString());
-    formData.append('Geometry.Location.Lng', marker?.longitude.toString());
+    formData.append('Geometry.Location.Lat', marker?.latitude.toString() || '');
+    formData.append('Geometry.Location.Lng', marker?.longitude.toString() || '');
     formData.append('ContactNumber', contactNumber);
     formData.append('Url', url);
     formData.append('Description', description);
@@ -320,7 +325,27 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
             <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={pricePerHour} onChange={(e) => setPricePerHour(Number(e.target.value))} />            
             <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingTime} onChange={handleTimeInput(setOpeningTime)} placeholder="HH:mm" InputProps={{ readOnly: isOpen24Hours }} />
             <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={closingTime} onChange={handleTimeInput(setClosingTime)} placeholder="HH:mm" InputProps={{ readOnly: isOpen24Hours }} />
-            <Input type="file" onChange={handleFileChange} sx={{ gridColumn: 'span 2' }} />
+            <Box sx={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ width: '200px', height: '200px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {imageUrl ? (
+                  <img src={imageUrl} alt="Parking Lot" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                ) : (
+                  <span>No Image</span>
+                )}
+              </Box>
+              <label htmlFor="file-upload">
+                <Input
+                  id="file-upload"
+                  type="file"
+                  onChange={handleFileChange}
+                  inputProps={{ accept: 'image/*' }}
+                  style={{ display: 'none' }}
+                />
+                <Button variant="contained" component="span">
+                  {file ? file.name : 'Chọn tệp'}
+                </Button>
+              </label>
+            </Box>
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>

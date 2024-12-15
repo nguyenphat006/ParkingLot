@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import PopupDetails from './PopupDetails';
 import PopupEdit from './PopupEdit';
 import PopupView from './PopupView';
-import { ParkingLot } from "@/types/parkinglot";
 import { RiEditBoxFill } from "react-icons/ri";
 import { FaTrash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
-import { RiResetLeftFill } from "react-icons/ri";
+// import { RiResetLeftFill } from "react-icons/ri";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -146,13 +145,13 @@ const Index = () => {
       width: 150,
       renderCell: (params) => (
         <div className="flex items-center justify-start space-x-4 mt-3">
-          <button className="hover:text-primary" onClick={() => openViewModal(params.row.id)}>
+          <button className="hover:text-primary" onClick={() => openViewModal(params.row.id)} title="View">
             <FaEye className="text-2xl" />
           </button>
-          <button className="hover:text-primary" onClick={() => openEditModal(params.row.id)}>
+          <button className="hover:text-primary" onClick={() => openEditModal(params.row.id)} title="Edit">
             <RiEditBoxFill className="text-xl" />
           </button>
-          <button className="hover:text-primary" onClick={() => openDeleteModal(params.row.id)}>
+          <button className="hover:text-primary" onClick={() => openDeleteModal(params.row.id)} title="Delete">
             <FaTrash className="text-lg" />
           </button>
         </div>
