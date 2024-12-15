@@ -39,6 +39,7 @@ const footerStyle = {
 
 const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLot }) => {
   const [parkingLotData, setParkingLotData] = useState<ParkingLot | null>(null);
+  const [openingHours, setOpeningHours] = useState<string>('');
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -58,6 +59,7 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
         });
         const data = await response.json();
         setParkingLotData(data);
+        setOpeningHours(data.opening_hours.weekday_text[0]);
       } catch (error) {
         console.error('Error fetching parking lot data:', error);
       }
@@ -87,12 +89,11 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={parkingLotData.name} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Mô tả" margin="normal" value={parkingLotData.description} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Địa chỉ" margin="normal" value={parkingLotData.formatted_address} InputProps={{ readOnly: true }} sx={{ gridColumn: 'span 2' }} />
-          <TextField fullWidth label="Sức chứa còn lại" margin="normal" value={parkingLotData.available_spaces} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Sức chứa" margin="normal" value={parkingLotData.total_spaces} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Tổng số chỗ" margin="normal" value={parkingLotData.total_spaces} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Số chỗ trống" margin="normal" value={parkingLotData.available_spaces} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={parkingLotData.formatted_phone_number} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Giờ mở cửa" margin="normal" value={parkingLotData.openingtime} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={parkingLotData.closingtime} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="" margin="normal" value={openingHours} InputProps={{ readOnly: true }} />
         </Box>
         <Box sx={footerStyle}>
           <Button onClick={onRequestClose} sx={{ mr: 2 }}>Đóng</Button>

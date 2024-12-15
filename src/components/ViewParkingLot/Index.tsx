@@ -169,11 +169,11 @@ const Index = () => {
                 Tổng số chỗ 
               </th>
               <th className="px-4 py-4 text-start font-medium text-dark dark:text-white xl:pr-7.5">
-                Số điện thoại liên hệ
+                Số chỗ trống
               </th>
               <th className="px-4 py-4 text-start font-medium text-dark dark:text-white xl:pr-7.5">
-                Mô tả
-              </th>
+                Số điện thoại liên hệ
+              </th>             
               <th className="px-4 py-4 text-center font-medium text-dark dark:text-white xl:pr-7.5">
                 Chức năng
               </th>
@@ -204,18 +204,19 @@ const Index = () => {
                     {packageItem.total_spaces}
                   </p>
                 </td>
+              
                 <td
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
                   <p className="text-dark dark:text-white">
-                    {packageItem.formatted_phone_number}
+                    {packageItem.available_spaces}
                   </p>
                 </td>
                 <td
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
                 >
                   <p className="text-dark dark:text-white">
-                    {packageItem.available_spaces}
+                    {packageItem.formatted_phone_number}
                   </p>
                 </td>
                 <td

@@ -12,7 +12,7 @@ interface PopupEditProps {
   isOpen: boolean;
   onRequestClose: () => void;
   parkingLot: ParkingLot;
-  refreshData: () => void;
+  refreshData: () => void; // Ensure refreshData is a function
 }
 
 const style = {
@@ -58,7 +58,6 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   const [marker, setMarker] = useState<{ latitude: number; longitude: number } | null>(null);
   const [address, setAddress] = useState<string | null>(null);
   const [name, setName] = useState<string>('');
-  const [capacity, setCapacity] = useState<number | ''>('');
   const [description, setDescription] = useState<string>('');
   const [alert, setAlert] = useState<{ title: string; body: string } | null>(null);
   const [error, setError] = useState<{ title: string; body: string } | null>(null);
@@ -69,14 +68,11 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   const [plusCodeGlobal, setPlusCodeGlobal] = useState<string>('');
   const [url, setUrl] = useState<string>('');
   const [totalSpaces, setTotalSpaces] = useState<number | ''>('');
-  const [compoundDistrict, setCompoundDistrict] = useState<string>('');
   const [formattedAddress, setFormattedAddress] = useState<string>('');
-  const [compoundProvince, setCompoundProvince] = useState<string>('');
   const [placeId, setPlaceId] = useState<string>('');
   const [availableSpaces, setAvailableSpaces] = useState<number | ''>('');
   const [pricePerHour, setPricePerHour] = useState<number | ''>('');
   const [isOpen24Hours, setIsOpen24Hours] = useState<boolean>(false);
-  const [compoundCommune, setCompoundCommune] = useState<string>('');
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -106,12 +102,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
         setContactNumber(data.formatted_phone_number);
         setTotalSpaces(data.total_spaces);
         setIsOpen24Hours(data.isOpen24Hours);
-        setCompoundProvince(data.compound.province);
-        setCompoundDistrict(data.compound.district);
-        setCompoundCommune(data.compound.commune);
         setPlaceId(data.place_id);
-        setPlusCodeGlobal(data.plus_code.global_code);
-        setPlusCodeCompound(data.plus_code.compound_code);
       } catch (error) {
         console.error('Error fetching parking lot data:', error);
       }
@@ -141,18 +132,8 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
       setAddress(address);
       console.log(`Address: ${address}`);
 
-      const compound = data.results[0]?.compound;
-      const province = compound?.province;
-      const district = compound?.district;
-      const commune = compound?.commune;
       const placeId = data.results[0]?.place_id;
-
-      setCompoundProvince(province || '');
-      setCompoundDistrict(district || '');
-      setCompoundCommune(commune || '');
       setPlaceId(placeId || '');
-      setPlusCodeGlobal(plusCodeGlobal || '');
-      setPlusCodeCompound(plusCodeCompound || '');
     } catch (error) {
       console.error('Error fetching address:', error);
     }
@@ -174,12 +155,12 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
     formData.append('OpeningTime', openingTime);
     formData.append('TotalSpaces', totalSpaces.toString());
     formData.append('PricePerHour', pricePerHour.toString());
-    formData.append('IsOpen24Hours', isOpen24Hours.toString());
+    formData.append('IsOpen24Hours', isOpen24Hours ? 'true' : 'false');
     formData.append('AvailableSpaces', availableSpaces.toString());
     formData.append('Formatted_address', address);
-    formData.append('Compound.Commune', compoundCommune);
-    formData.append('Compound.District', compoundDistrict);
-    formData.append('Compound.Province', compoundProvince);
+    formData.append('Compound.Commune', 'Sample Commune');
+    formData.append('Compound.District', 'Sample District');
+    formData.append('Compound.Province', 'Sample Province');
     formData.append('Geometry.Location.Lat', marker?.latitude.toString());
     formData.append('Geometry.Location.Lng', marker?.longitude.toString());
     formData.append('ContactNumber', contactNumber);
@@ -213,7 +194,9 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
       setTimeout(() => {
         setAlert(null);
         onRequestClose();
-        refreshData();
+        if (typeof refreshData === 'function') {
+          refreshData(); // Ensure refreshData is called as a function
+        }
       }, 3000);
     } catch (error) {
       console.error('Error updating parking lot:', error);
@@ -235,7 +218,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
       aria-describedby="modal-description"
     >
       <div>
-        <div className="fixed top-4 right-4 transition-transform duration-300 transform" style={{ transform: alert || error ? 'translateY(0)' : 'translateY(-100%)' }}>
+        <div className="z-99 fixed top-4 right-4 transition-transform duration-300 transform" style={{ transform: alert || error ? 'translateY(0)' : 'translateY(-100%)' }}>
           {alert && <AlertSuccess message={alert} />}
           {error && <AlertError message={error} />}
         </div>
@@ -247,16 +230,33 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
             <TextField fullWidth label="Tên bãi đậu xe" margin="normal" value={name} onChange={(e) => setName(e.target.value)} />
             <TextField fullWidth label="Mô tả" margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} />
             <TextField fullWidth label="Địa chỉ" margin="normal" value={address || ''} InputProps={{ readOnly: true }} />
+            <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />   
             <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
             <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />  
-            <TextField fullWidth label="Tỉnh thành" margin="normal" value={compoundProvince} InputProps={{ readOnly: true }} />
-            <TextField fullWidth label="Quận huyện" margin="normal" value={compoundDistrict} InputProps={{ readOnly: true }} />
-            <TextField fullWidth label="Phường xã" margin="normal" value={compoundCommune} InputProps={{ readOnly: true }} />
-            <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={closingTime} onChange={(e) => setClosingTime(e.target.value)} />
-            <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingTime} onChange={(e) => setOpeningTime(e.target.value)} />
-            <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={contactNumber} onChange={(e) => setContactNumber(e.target.value)} />           
             <TextField fullWidth label="Tổng số chỗ" margin="normal" value={totalSpaces} onChange={(e) => setTotalSpaces(Number(e.target.value))} />
-            <TextField fullWidth label="Số chỗ trống" margin="normal" value={availableSpaces} onChange={(e) => setAvailableSpaces(Number(e.target.value))} />
+            <TextField fullWidth label="Số chỗ trống" margin="normal" value={availableSpaces} onChange={(e) => setAvailableSpaces(Number(e.target.value))} />                  
+            <TextField
+              fullWidth
+              label="Giờ mở cửa"
+              margin="normal"
+              type="time"
+              value={openingTime}
+              onChange={(e) => setOpeningTime(e.target.value)}
+              InputLabelProps={{
+                shrink: true, // Giúp hiển thị label khi sử dụng type="time"
+              }}
+            />
+            <TextField
+              fullWidth
+              label="Giờ đóng cửa"
+              margin="normal"
+              type="time"
+              value={closingTime}
+              onChange={(e) => setClosingTime(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
             <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={pricePerHour} onChange={(e) => setPricePerHour(Number(e.target.value))} />
             <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" value={isOpen24Hours} onChange={(e) => setIsOpen24Hours(e.target.checked)} type="checkbox" />            
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
