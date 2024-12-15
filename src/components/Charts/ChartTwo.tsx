@@ -1,17 +1,43 @@
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 
 const ChartTwo: React.FC = () => {
+  const [parkingLotCount, setParkingLotCount] = useState<number[]>([]);
+  const [totalSpaces, setTotalSpaces] = useState<number[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/ParkingLots')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'OK' && Array.isArray(data.results)) {
+          const parkingLots = data.results;
+          const count: number[] = [];
+          const spaces: number[] = [];
+
+          parkingLots.forEach((parking: any) => {
+            count.push(parking.id);
+            spaces.push(parking.total_spaces);
+          });
+
+          setParkingLotCount(count);
+          setTotalSpaces(spaces);
+        } else {
+          console.error('Unexpected data format:', data);
+        }
+      })
+      .catch(error => console.error('Error fetching parking data:', error));
+  }, []);
+
   const series = [
     {
-      name: "Sales",
-      data: [44, 55, 41, 67, 22, 43, 65],
+      name: "Số lượng bãi đậu xe",
+      data: parkingLotCount,
     },
     {
-      name: "Revenue",
-      data: [13, 23, 20, 8, 13, 27, 15],
+      name: "Tổng số lượng chỗ",
+      data: totalSpaces,
     },
   ];
 
@@ -94,15 +120,15 @@ const ChartTwo: React.FC = () => {
   };
 
   return (
-    <div className="col-span-12 rounded-[10px] bg-white px-7.5 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-5">
+    <div className="col-span-12 rounded-[10px] bg-white px-7.5 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card xl:col-span-7">
       <div className="mb-4 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Profit this week
+            Thống kê bãi đậu xe
           </h4>
         </div>
         <div>
-          <DefaultSelectOption options={["This Week", "Last Week"]} />
+          <DefaultSelectOption options={["Tuần này", "Tuần trước"]} />
         </div>
       </div>
 

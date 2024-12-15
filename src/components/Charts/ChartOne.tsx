@@ -1,17 +1,45 @@
 import { ApexOptions } from "apexcharts";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 
 const ChartOne: React.FC = () => {
+  const [receivedAmount, setReceivedAmount] = useState<number[]>([]);
+  const [dueAmount, setDueAmount] = useState<number[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/ParkingLots')
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'OK' && Array.isArray(data.results)) {
+          const parkingLots = data.results;
+          const received: number[] = [];
+          const due: number[] = [];
+
+          parkingLots.forEach((parking: any) => {
+            const revenue = parking.total_spaces * parking.price_per_hour;
+            const potentialRevenue = parking.available_spaces * parking.price_per_hour;
+            received.push(revenue);
+            due.push(potentialRevenue);
+          });
+
+          setReceivedAmount(received);
+          setDueAmount(due);
+        } else {
+          console.error('Unexpected data format:', data);
+        }
+      })
+      .catch(error => console.error('Error fetching parking data:', error));
+  }, []);
+
   const series = [
     {
-      name: "Received Amount",
-      data: [0, 20, 35, 45, 35, 55, 65, 50, 65, 75, 60, 75],
+      name: "Số tiền đã nhận",
+      data: receivedAmount,
     },
     {
-      name: "Due Amount",
-      data: [15, 9, 17, 32, 25, 68, 80, 68, 84, 94, 74, 62],
+      name: "Số tiền còn lại",
+      data: dueAmount,
     },
   ];
 
@@ -86,7 +114,7 @@ const ChartOne: React.FC = () => {
       },
       y: {
         title: {
-          formatter: function (e) {
+          formatter: function () {
             return "";
           },
         },
@@ -124,6 +152,9 @@ const ChartOne: React.FC = () => {
           fontSize: "0px",
         },
       },
+      labels: {
+        formatter: (value) => `$${value.toFixed(2)}`,
+      },
     },
   };
 
@@ -132,14 +163,14 @@ const ChartOne: React.FC = () => {
       <div className="mb-3.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Payments Overview
+            Tổng Quan Thanh Toán
           </h4>
         </div>
         <div className="flex items-center gap-2.5">
           <p className="font-medium uppercase text-dark dark:text-dark-6">
-            Short by:
+            Sắp xếp theo:
           </p>
-          <DefaultSelectOption options={["Monthly", "Yearly"]} />
+          <DefaultSelectOption options={["Hàng tháng", "Hàng năm"]} />
         </div>
       </div>
       <div>
@@ -155,13 +186,13 @@ const ChartOne: React.FC = () => {
 
       <div className="flex flex-col gap-2 text-center xsm:flex-row xsm:gap-0">
         <div className="border-stroke dark:border-dark-3 xsm:w-1/2 xsm:border-r">
-          <p className="font-medium">Received Amount</p>
+          <p className="font-medium">Số tiền đã nhận</p>
           <h4 className="mt-1 text-xl font-bold text-dark dark:text-white">
             $45,070.00
           </h4>
         </div>
         <div className="xsm:w-1/2">
-          <p className="font-medium">Due Amount</p>
+          <p className="font-medium">Số tiền còn lại</p>
           <h4 className="mt-1 text-xl font-bold text-dark dark:text-white">
             $32,400.00
           </h4>
