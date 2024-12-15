@@ -17,6 +17,8 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 1200,
+  maxHeight: '90vh',
+  overflowY: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
@@ -40,6 +42,7 @@ const footerStyle = {
 const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLot }) => {
   const [parkingLotData, setParkingLotData] = useState<ParkingLot | null>(null);
   const [openingHours, setOpeningHours] = useState<string>('');
+  const [closingHours, setClosingHours] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -61,7 +64,8 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
         const data = await response.json();
         const parkingLotDetails = data.result.parkingLot;
         setParkingLotData(parkingLotDetails);
-        setOpeningHours(parkingLotDetails.opening_hours.weekday_text[0]);
+        setOpeningHours(parkingLotDetails.opening_hours.operating_hours.open);
+        setClosingHours(parkingLotDetails.opening_hours.operating_hours.close);
         if (parkingLotDetails.photos && parkingLotDetails.photos.length > 0) {
           setImageUrl(`http://localhost:8000${parkingLotDetails.photos[0].photo_reference}`);
         }
@@ -97,8 +101,9 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
           <TextField fullWidth label="Tổng số chỗ" margin="normal" value={parkingLotData.total_spaces} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Số chỗ trống" margin="normal" value={parkingLotData.available_spaces} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Số điện thoại liên hệ" margin="normal" value={parkingLotData.formatted_phone_number} InputProps={{ readOnly: true }} />
-          <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={parkingLotData.price_per_hour} InputProps={{ readOnly: true }} />         
           <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingHours} InputProps={{ readOnly: true }} />
+          <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={closingHours} InputProps={{ readOnly: true }} />
           <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" value={parkingLotData.isOpen24Hours ? 'Có' : 'Không'} InputProps={{ readOnly: true }} />
           <Box sx={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: 2 }}>
             <Box sx={{ width: '200px', height: '200px', border: '1px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -106,8 +106,8 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
         setDescription(parkingLotDetails.description);
         setAvailableSpaces(parkingLotDetails.available_spaces);
         setPricePerHour(parkingLotDetails.price_per_hour);
-        setOpeningTime(parkingLotDetails.opening_hours.weekday_text[0]);
-        setClosingTime(parkingLotDetails.opening_hours.weekday_text[0]);
+        setOpeningTime(parkingLotDetails.opening_hours.operating_hours.open);
+        setClosingTime(parkingLotDetails.opening_hours.operating_hours.close);
         setContactNumber(parkingLotDetails.formatted_phone_number);
         setTotalSpaces(parkingLotDetails.total_spaces);
         setIsOpen24Hours(parkingLotDetails.isOpen24Hours);
