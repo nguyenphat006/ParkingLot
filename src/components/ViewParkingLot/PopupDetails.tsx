@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import MapGL, { Marker } from '@goongmaps/goong-map-react';
 import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
+import Autocomplete from '@mui/material/Autocomplete';
 
 interface PopupDetailsProps {
   isOpen: boolean;
@@ -72,6 +73,8 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
   const [pricePerHour, setPricePerHour] = useState<number | ''>('');
   const [isOpen24Hours, setIsOpen24Hours] = useState<boolean>(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const validateFields = () => {
     const newErrors: { [key: string]: string } = {};
@@ -174,7 +177,9 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
         setAlert(null);
         onRequestClose();
         resetFields();
-        refreshData();
+        if (typeof refreshData === 'function') {
+          refreshData(); // Ensure refreshData is called as a function
+        }
       }, 3000);
     } catch (error) {
       console.error('Error adding parking lot:', error);
@@ -209,6 +214,45 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     setAvailableSpaces('');
     setPricePerHour('');
     setIsOpen24Hours(false);
+  };
+
+  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+
+    if (query.length > 2) {
+      try {
+        const response = await fetch(`https://rsapi.goong.io/Place/AutoComplete?input=${query}&api_key=${GOONG_API_KEY}`);
+        const data = await response.json();
+        setSearchResults(data.predictions || []);
+      } catch (error) {
+        console.error('Error fetching search results:', error);
+        setSearchResults([]);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleSearchSelect = async (event: any, value: any) => {
+    if (value) {
+      try {
+        const response = await fetch(`https://rsapi.goong.io/Place/Detail?placeid=${value.place_id}&api_key=${GOONG_API_KEY}`);
+        const data = await response.json();
+        const location = data.result.geometry.location;
+        setMarker({ latitude: location.lat, longitude: location.lng });
+        setAddress(data.result.formatted_address);
+        setPlaceId(data.result.place_id);
+        setViewport({
+          ...viewport,
+          latitude: location.lat,
+          longitude: location.lng,
+          zoom: 15
+        });
+      } catch (error) {
+        console.error('Error fetching place details:', error);
+      }
+    }
   };
 
   return (
@@ -288,11 +332,11 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               type="time"
               value={openingTime}
               onChange={(e) => setOpeningTime(e.target.value)}
-              InputLabelProps={{
-                shrink: true, // Giúp nhãn hiển thị khi dùng type="time"
-              }}
               error={!!errors.openingTime}
               helperText={errors.openingTime}
+              InputLabelProps={{
+                shrink: true, // Giúp hiển thị label khi sử dụng type="time"
+              }}
             />
             <TextField
               fullWidth
@@ -301,13 +345,12 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               type="time"
               value={closingTime}
               onChange={(e) => setClosingTime(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
               error={!!errors.closingTime}
               helperText={errors.closingTime}
+              InputLabelProps={{
+                shrink: true, // Giúp hiển thị label khi sử dụng type="time"
+              }}
             />
-
             <TextField
               fullWidth
               label="Tổng số chỗ"
@@ -347,7 +390,17 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>
             {showAdditionalContent && (
-              <Box sx={{ gridColumn: 'span 2', height: '400px' }}>
+              <Box sx={{ gridColumn: 'span 2', height: '400px', position: 'relative' }}>
+                <Autocomplete
+                  freeSolo
+                  options={searchResults}
+                  getOptionLabel={(option) => option.description}
+                  onInputChange={handleSearchChange}
+                  onChange={handleSearchSelect}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Tìm kiếm địa điểm" margin="normal" sx={{ position: 'absolute', top: 0, left: 0, zIndex: 1, width: '100%' }} />
+                  )}
+                />
                 <MapGL
                   {...viewport}
                   width="100%"

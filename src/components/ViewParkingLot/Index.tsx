@@ -11,6 +11,7 @@ import { RiResetLeftFill } from "react-icons/ri";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 const style = {
   position: 'absolute' as 'absolute',
@@ -133,112 +134,50 @@ const Index = () => {
     }
   };
 
-  const selectedParkingLot = (viewId !== null ? packageData[viewId] : null) || (editId !== null ? packageData[editId] : null);
+  const columns: GridColDef[] = [
+    { field: 'name', headerName: 'Bãi đậu xe', width: 220 },
+    { field: 'formatted_address', headerName: 'Địa chỉ', width: 550 },
+    { field: 'total_spaces', headerName: 'Tổng số chỗ', width: 120 },
+    { field: 'available_spaces', headerName: 'Số chỗ trống', width: 120 },
+    { field: 'formatted_phone_number', headerName: 'Số điện thoại liên hệ', width: 200 },
+    {
+      field: 'actions',
+      headerName: 'Chức năng',
+      width: 150,
+      renderCell: (params) => (
+        <div className="flex items-center justify-start space-x-4 mt-3">
+          <button className="hover:text-primary" onClick={() => openViewModal(params.row.id)}>
+            <FaEye className="text-2xl" />
+          </button>
+          <button className="hover:text-primary" onClick={() => openEditModal(params.row.id)}>
+            <RiEditBoxFill className="text-xl" />
+          </button>
+          <button className="hover:text-primary" onClick={() => openDeleteModal(params.row.id)}>
+            <FaTrash className="text-lg" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const selectedParkingLot = packageData.find(item => item.id === viewId) || packageData.find(item => item.id === editId);
 
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
       <div className="flex justify-between mb-4">
         <button className="bg-primary text-white px-4 py-2 rounded" onClick={openModal}>
           Thêm mới
-        </button>
-        <div className="flex space-x-4">
-          <input
-            type="text"
-            placeholder="Tìm kiếm..."
-            className="border border-stroke px-4 py-2 rounded"
-          />
-          {/* <select className="border border-stroke px-4 py-2 rounded">
-            <option value="">Lọc theo....</option>
-            <option value="Paid">Paid</option>
-            <option value="Unpaid">Unpaid</option>
-            <option value="Pending">Pending</option>
-          </select> */}
-        </div>
+        </button>       
       </div>
-      <div className="max-w-full overflow-x-auto relative">
-        <table className="w-full table-auto">
-          <thead>
-            <tr className="bg-[#F7F9FC] text-left dark:bg-dark-2">
-              <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white xl:pl-7.5">
-                Bãi đậu xe  
-              </th>
-              <th className="min-w-[150px] px-4 py-4 font-medium text-dark dark:text-white">
-                Địa chỉ
-              </th>
-              <th className="min-w-[120px] px-4 py-4 font-medium text-dark dark:text-white">
-                Tổng số chỗ 
-              </th>
-              <th className="px-4 py-4 text-start font-medium text-dark dark:text-white xl:pr-7.5">
-                Số chỗ trống
-              </th>
-              <th className="px-4 py-4 text-start font-medium text-dark dark:text-white xl:pr-7.5">
-                Số điện thoại liên hệ
-              </th>             
-              <th className="px-4 py-4 text-center font-medium text-dark dark:text-white xl:pr-7.5">
-                Chức năng
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {packageData.map((packageItem, index) => (
-              <tr key={index}>
-                <td className="hidden">{packageItem.id}</td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pl-7.5 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <h5 className="text-dark dark:text-white">
-                    {packageItem.name}
-                  </h5>
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <p className="text-dark dark:text-white">
-                    {packageItem.formatted_address}
-                  </p>
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <p className="text-dark dark:text-white">
-                    {packageItem.total_spaces}
-                  </p>
-                </td>
-              
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <p className="text-dark dark:text-white">
-                    {packageItem.available_spaces}
-                  </p>
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <p className="text-dark dark:text-white">
-                    {packageItem.formatted_phone_number}
-                  </p>
-                </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pr-7.5 ${index === packageData.length - 1 ? "border-b-0" : "border-b"}`}
-                >
-                  <div className="flex items-center justify-end space-x-4 ">
-                    <button className="hover:text-primary" onClick={() => openViewModal(index)}>
-                      <FaEye className="text-2xl" />
-                    </button>
-                    <button className="hover:text-primary" onClick={() => openEditModal(index)}>
-                      <RiEditBoxFill className="text-xl"/>
-                    </button>
-                    <button className="hover:text-primary" onClick={() => openDeleteModal(packageItem.id)}>
-                      <FaTrash className="text-lg"/>
-                    </button>                    
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <RiResetLeftFill className="cursor-pointer text-2xl ml-auto" onClick={refreshData}/>
+      <div className="max-w-full overflow-x-auto relative" style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          rows={packageData}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5, 10, 20]}
+          checkboxSelection={false}
+          disableSelectionOnClick
+        />
       </div>
       <PopupDetails isOpen={isModalOpen} onRequestClose={closeModal} />
       {selectedParkingLot && (
