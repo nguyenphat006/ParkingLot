@@ -139,9 +139,9 @@ const MapOne: React.FC = () => {
               <h2 id="modal-title" className="text-lg font-bold">{selectedMarker.name}</h2>
               <p id="modal-description" className="mt-2">{selectedMarker.formatted_address}</p>
               <p className="mt-2">Điện thoại liên hệ: {selectedMarker.formatted_phone_number}</p>
-              <p className="mt-2">Tổng số chỗ: {selectedMarker.total_spaces}</p>
-              <p className="mt-2">Số chỗ hiện có: {selectedMarker.available_spaces}</p>
-              <p className="mt-2">Gía thành/tiếng: {selectedMarker.price_per_hour}</p>
+              <p className="mt-2">Tổng số chỗ: {selectedMarker.total_spaces} chỗ</p>
+              <p className="mt-2">Số chỗ hiện có: {selectedMarker.available_spaces} chỗ</p>
+              <p className="mt-2">Gía thành/tiếng: {selectedMarker.price_per_hour}$</p>
               <p className="mt-2">Mô tả: {selectedMarker.description}</p>
             </>
           )}

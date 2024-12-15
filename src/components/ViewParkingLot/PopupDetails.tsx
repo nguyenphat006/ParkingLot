@@ -7,6 +7,9 @@ import MapGL, { Marker } from '@goongmaps/goong-map-react';
 import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
 import Autocomplete from '@mui/material/Autocomplete';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Input from '@mui/material/Input';
 
 interface PopupDetailsProps {
   isOpen: boolean;
@@ -75,6 +78,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [file, setFile] = useState<File | null>(null);
 
   const validateFields = () => {
     const newErrors: { [key: string]: string } = {};
@@ -82,8 +86,6 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     if (!address) newErrors.address = 'Địa chỉ không được để trống';
     if (!contactNumber) newErrors.contactNumber = 'Số điện thoại liên hệ không được để trống';
     if (!marker) newErrors.marker = 'Vui lòng chọn vị trí trên bản đồ';
-    if (!openingTime) newErrors.openingTime = 'Giờ mở cửa không được để trống';
-    if (!closingTime) newErrors.closingTime = 'Giờ đóng cửa không được để trống';
     if (totalSpaces === '') newErrors.totalSpaces = 'Tổng số chỗ không được để trống';
     if (availableSpaces === '') newErrors.availableSpaces = 'Số chỗ trống không được để trống';
     if (pricePerHour === '') newErrors.pricePerHour = 'Giá mỗi giờ không được để trống';
@@ -129,6 +131,19 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       return;
     }
 
+    if (!isOpen24Hours) {
+      if (!openingTime || !closingTime) {
+        setError({
+          title: "Lỗi",
+          body: "Giờ mở cửa và giờ đóng cửa không được để trống.",
+        });
+        setTimeout(() => {
+          setError(null);
+        }, 3000);
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append('Name', name);
     formData.append('Types', 'parkinglot');
@@ -148,6 +163,9 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     formData.append('ContactNumber', contactNumber);
     formData.append('Url', url);
     formData.append('Description', description);
+    if (file) {
+      formData.append('images', file);
+    }
 
     try {
       const response = await fetch('http://localhost:8000/api/ParkingLots', {
@@ -214,6 +232,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
     setAvailableSpaces('');
     setPricePerHour('');
     setIsOpen24Hours(false);
+    setFile(null);
   };
 
   const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +271,22 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       } catch (error) {
         console.error('Error fetching place details:', error);
       }
+    }
+  };
+
+  const handleTimeInput = (setter: React.Dispatch<React.SetStateAction<string>>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    if (value.length === 2 && !value.includes(':')) {
+      value = value + ':';
+    }
+    if (value.length <= 5) {
+      setter(value);
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0]);
     }
   };
 
@@ -324,33 +359,8 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               InputProps={{ readOnly: true }}
               error={!!errors.marker}
               helperText={errors.marker}
-            />  
-            <TextField
-              fullWidth
-              label="Giờ mở cửa"
-              margin="normal"
-              type="time"
-              value={openingTime}
-              onChange={(e) => setOpeningTime(e.target.value)}
-              error={!!errors.openingTime}
-              helperText={errors.openingTime}
-              InputLabelProps={{
-                shrink: true, // Giúp hiển thị label khi sử dụng type="time"
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Giờ đóng cửa"
-              margin="normal"
-              type="time"
-              value={closingTime}
-              onChange={(e) => setClosingTime(e.target.value)}
-              error={!!errors.closingTime}
-              helperText={errors.closingTime}
-              InputLabelProps={{
-                shrink: true, // Giúp hiển thị label khi sử dụng type="time"
-              }}
-            />
+            />                                             
+                          
             <TextField
               fullWidth
               label="Tổng số chỗ"
@@ -359,7 +369,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               onChange={(e) => setTotalSpaces(Number(e.target.value))}
               error={!!errors.totalSpaces}
               helperText={errors.totalSpaces}
-            />
+            />              
             <TextField
               fullWidth
               label="Số chỗ trống"
@@ -368,7 +378,18 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
               onChange={(e) => setAvailableSpaces(Number(e.target.value))}
               error={!!errors.availableSpaces}
               helperText={errors.availableSpaces}
-            />
+            />             
+            <TextField
+              fullWidth
+              label="Mở cửa 24 giờ"
+              margin="normal"
+              select
+              value={isOpen24Hours ? 'true' : 'false'}
+              onChange={(e) => setIsOpen24Hours(e.target.value === 'true')}
+            >
+              <MenuItem value="true">Có</MenuItem>
+              <MenuItem value="false">Không</MenuItem>
+            </TextField> 
             <TextField
               fullWidth
               label="Giá mỗi giờ"
@@ -380,12 +401,27 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
             />
             <TextField
               fullWidth
-              label="Mở cửa 24 giờ"
+              label="Giờ mở cửa"
               margin="normal"
-              value={isOpen24Hours}
-              onChange={(e) => setIsOpen24Hours(e.target.checked)}
-              type="checkbox"
-            />            
+              value={openingTime}
+              onChange={handleTimeInput(setOpeningTime)}
+              error={!isOpen24Hours && !!errors.openingTime}
+              helperText={!isOpen24Hours && errors.openingTime}
+              placeholder="HH:mm"
+              InputProps={{ readOnly: isOpen24Hours }}
+            />
+            <TextField
+              fullWidth
+              label="Giờ đóng cửa"
+              margin="normal"
+              value={closingTime}
+              onChange={handleTimeInput(setClosingTime)}
+              error={!isOpen24Hours && !!errors.closingTime}
+              helperText={!isOpen24Hours && errors.closingTime}
+              placeholder="HH:mm"
+              InputProps={{ readOnly: isOpen24Hours }}
+            />
+            <Input type="file" onChange={handleFileChange} sx={{ gridColumn: 'span 2' }} />
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>
@@ -418,6 +454,7 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
                 </MapGL>
               </Box>
             )}
+            
           </Box>
           <Box sx={footerStyle}>
             <Button onClick={handleClose} sx={{ mr: 2 }}>Hủy</Button>

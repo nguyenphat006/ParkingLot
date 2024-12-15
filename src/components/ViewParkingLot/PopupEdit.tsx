@@ -8,6 +8,9 @@ import AlertSuccess from "../Alerts/AlertSuccess";
 import AlertError from "../Alerts/AlertError";
 import { ParkingLot } from "@/types/parkinglot";
 import Autocomplete from '@mui/material/Autocomplete';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Input from '@mui/material/Input';
 
 interface PopupEditProps {
   isOpen: boolean;
@@ -76,6 +79,7 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   const [isOpen24Hours, setIsOpen24Hours] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
@@ -181,12 +185,41 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
     }
   };
 
+  const handleTimeInput = (setter: React.Dispatch<React.SetStateAction<string>>) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    let value = event.target.value;
+    if (value.length === 2 && !value.includes(':')) {
+      value = value + ':';
+    }
+    if (value.length <= 5) {
+      setter(value);
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setFile(event.target.files[0]);
+    }
+  };
+
   const handleSave = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       console.error('No token found in localStorage');
       window.location.href = '/auth/signin';
       return;
+    }
+
+    if (!isOpen24Hours) {
+      if (!openingTime || !closingTime) {
+        setError({
+          title: "Lỗi",
+          body: "Giờ mở cửa và giờ đóng cửa không được để trống.",
+        });
+        setTimeout(() => {
+          setError(null);
+        }, 3000);
+        return;
+      }
     }
 
     const formData = new FormData();
@@ -208,6 +241,9 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
     formData.append('ContactNumber', contactNumber);
     formData.append('Url', url);
     formData.append('Description', description);
+    if (file) {
+      formData.append('images', file);
+    }
 
     try {
       const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
@@ -276,11 +312,15 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
             <TextField fullWidth label="Vĩ độ" margin="normal" value={marker?.latitude || ''} InputProps={{ readOnly: true }} />
             <TextField fullWidth label="Kinh độ" margin="normal" value={marker?.longitude || ''} InputProps={{ readOnly: true }} />  
             <TextField fullWidth label="Tổng số chỗ" margin="normal" value={totalSpaces} onChange={(e) => setTotalSpaces(Number(e.target.value))} />
-            <TextField fullWidth label="Số chỗ trống" margin="normal" value={availableSpaces} onChange={(e) => setAvailableSpaces(Number(e.target.value))} />                  
-            <TextField fullWidth label="Giờ mở cửa" margin="normal"  type="time" value={openingTime} onChange={(e) => setOpeningTime(e.target.value)} InputLabelProps={{shrink: true,}} />
-            <TextField fullWidth label="Giờ đóng cửa" margin="normal" type="time" value={closingTime} onChange={(e) => setClosingTime(e.target.value)} InputLabelProps={{shrink: true,}} />
-            <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={pricePerHour} onChange={(e) => setPricePerHour(Number(e.target.value))} />
-            <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" value={isOpen24Hours} onChange={(e) => setIsOpen24Hours(e.target.checked)} type="checkbox" />            
+            <TextField fullWidth label="Số chỗ trống" margin="normal" value={availableSpaces} onChange={(e) => setAvailableSpaces(Number(e.target.value))} />
+            <TextField fullWidth label="Mở cửa 24 giờ" margin="normal" select value={isOpen24Hours ? 'true' : 'false'} onChange={(e) => setIsOpen24Hours(e.target.value === 'true')}>
+              <MenuItem value="true">Có</MenuItem>
+              <MenuItem value="false">Không</MenuItem>
+            </TextField>                 
+            <TextField fullWidth label="Giá mỗi giờ" margin="normal" value={pricePerHour} onChange={(e) => setPricePerHour(Number(e.target.value))} />            
+            <TextField fullWidth label="Giờ mở cửa" margin="normal" value={openingTime} onChange={handleTimeInput(setOpeningTime)} placeholder="HH:mm" InputProps={{ readOnly: isOpen24Hours }} />
+            <TextField fullWidth label="Giờ đóng cửa" margin="normal" value={closingTime} onChange={handleTimeInput(setClosingTime)} placeholder="HH:mm" InputProps={{ readOnly: isOpen24Hours }} />
+            <Input type="file" onChange={handleFileChange} sx={{ gridColumn: 'span 2' }} />
             <Button onClick={handleToggleContent} sx={{ gridColumn: 'span 2' }}>
               {showAdditionalContent ? 'Ẩn nội dung' : 'Chọn vị trí'}
             </Button>
