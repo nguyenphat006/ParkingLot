@@ -46,8 +46,8 @@ const footerStyle = {
   justifyContent: 'flex-end'
 };
 
-const GOONG_MAPTILES_KEY = 'jQz7dTS6LtjN9z5JjoBFc7fQ2stAk4UocQnvm51F';
-const GOONG_API_KEY = 'zR0c6DjYs3YWpvi5zSfywPUPesH2G1Liy7rqfVin';
+const GOONG_MAPTILES_KEY = 'EZNYawkacQB3WH9yK7dIFTYVkrNxWJgnHkw2v1WE';
+const GOONG_API_KEY = 'dPuRDkoGWeXSogehCRGzARfnsyMBgS1TOWyGMPRI';
 
 const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
