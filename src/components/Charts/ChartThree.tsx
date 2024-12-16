@@ -98,7 +98,7 @@ const ChartThree: React.FC = () => {
       <div className="mb-9 justify-between gap-4 sm:flex">
         <div>
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Bãi Đậu Xe Theo Thành Phố
+            Bãi Đậu Xe Theo Tỉnh Thành
           </h4>
         </div>
         {/* <div>
