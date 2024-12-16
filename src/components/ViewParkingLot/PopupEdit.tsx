@@ -46,7 +46,7 @@ const footerStyle = {
 };
 
 const GOONG_MAPTILES_KEY = 'EZNYawkacQB3WH9yK7dIFTYVkrNxWJgnHkw2v1WE';
-const GOONG_API_KEY = 'dPuRDkoGWeXSogehCRGzARfnsyMBgS1TOWyGMPRI';
+const GOONG_API_KEY = 'WlmIT8XtdGdBS6pBOePEve49zUx9waRQDSOXrVRv';
 
 const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLot, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
@@ -82,18 +82,18 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No token found in localStorage');
-        window.location.href = '/auth/signin';
-        return;
-      }
+      // const token = localStorage.getItem('token');
+      // if (!token) {
+      //   console.error('No token found in localStorage');
+      //   window.location.href = '/auth/signin';
+      //   return;
+      // }
 
       try {
         const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`
+            // 'Authorization': `Bearer ${token}`
           }
         });
         const data = await response.json();
@@ -207,12 +207,12 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No token found in localStorage');
-      window.location.href = '/auth/signin';
-      return;
-    }
+    // const token = localStorage.getItem('token');
+    // if (!token) {
+    //   console.error('No token found in localStorage');
+    //   window.location.href = '/auth/signin';
+    //   return;
+    // }
 
     if (!isOpen24Hours) {
       if (!openingTime || !closingTime) {
@@ -254,15 +254,15 @@ const PopupEdit: React.FC<PopupEditProps> = ({ isOpen, onRequestClose, parkingLo
       const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         },
         body: formData
       });
 
-      if (response.status === 401) {
-        window.location.href = '/auth/signin';
-        return;
-      }
+      // if (response.status === 401) {
+      //   window.location.href = '/auth/signin';
+      //   return;
+      // }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -47,18 +47,18 @@ const PopupView: React.FC<PopupViewProps> = ({ isOpen, onRequestClose, parkingLo
 
   useEffect(() => {
     const fetchParkingLotData = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('Hết thời hạn token');
-        window.location.href = '/auth/signin';
-        return;
-      }
+      // const token = localStorage.getItem('token');
+      // if (!token) {
+      //   console.error('Hết thời hạn token');
+      //   window.location.href = '/auth/signin';
+      //   return;
+      // }
 
       try {
         const response = await fetch(`http://localhost:8000/api/ParkingLots/${parkingLot.id}`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`
+            // 'Authorization': `Bearer ${token}`
           }
         });
         const data = await response.json();

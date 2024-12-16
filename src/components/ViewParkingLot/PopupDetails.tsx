@@ -47,7 +47,7 @@ const footerStyle = {
 };
 
 const GOONG_MAPTILES_KEY = 'EZNYawkacQB3WH9yK7dIFTYVkrNxWJgnHkw2v1WE';
-const GOONG_API_KEY = 'dPuRDkoGWeXSogehCRGzARfnsyMBgS1TOWyGMPRI';
+const GOONG_API_KEY = 'WlmIT8XtdGdBS6pBOePEve49zUx9waRQDSOXrVRv';
 
 const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, refreshData }) => {
   const [showAdditionalContent, setShowAdditionalContent] = useState(false);
@@ -124,12 +124,12 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       setErrors(newErrors);
       return;
     }
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No token found in localStorage');
-      window.location.href = '/auth/signin';
-      return;
-    }
+    // const token = localStorage.getItem('token');
+    // if (!token) {
+    //   console.error('No token found in localStorage');
+    //   window.location.href = '/auth/signin';
+    //   return;
+    // }
 
     if (!isOpen24Hours) {
       if (!openingTime || !closingTime) {
@@ -171,15 +171,15 @@ const PopupDetails: React.FC<PopupDetailsProps> = ({ isOpen, onRequestClose, ref
       const response = await fetch('http://localhost:8000/api/ParkingLots', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         },
         body: formData
       });
 
-      if (response.status === 401) {
-        window.location.href = '/auth/signin';
-        return;
-      }
+      // if (response.status === 401) {
+      //   window.location.href = '/auth/signin';
+      //   return;
+      // }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

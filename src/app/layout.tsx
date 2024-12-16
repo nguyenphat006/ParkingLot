@@ -16,12 +16,12 @@ export default function RootLayout({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token && window.location.pathname !== "/auth/signin" && window.location.pathname !== "/auth/signup") {
-      window.location.href = "/auth/signin";
-    } else {
+    // const token = localStorage.getItem("token");
+    // if (!token && window.location.pathname !== "/auth/signin" && window.location.pathname !== "/auth/signup") {
+    //   window.location.href = "/auth/signin";
+    // } else {
       setTimeout(() => setLoading(false), 1000);
-    }
+    // }
   }, []);
 
   return (

@@ -108,17 +108,17 @@ const Index = () => {
     if (!deleteId) return;
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('Hết thời hạn token');
-        window.location.href = '/auth/signin';
-        return;
-      }
+      // const token = localStorage.getItem('token');
+      // if (!token) {
+      //   console.error('Hết thời hạn token');
+      //   window.location.href = '/auth/signin';
+      //   return;
+      // }
 
       const response = await fetch(`http://localhost:8000/api/ParkingLots/${deleteId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          // 'Authorization': `Bearer ${token}`
         }
       });
 
